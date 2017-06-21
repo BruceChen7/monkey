@@ -1,3 +1,5 @@
 *.o
 *.pyc
 tags
+*.swp
+bin/

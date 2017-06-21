@@ -1,8 +1,9 @@
 #ifndef __LEX__
 #define __LEX__
 #include <string>
-using namespace std;
+#include <unordered_map>
 
+using namespace std;
 enum class TokenType { 
     EndOfLine,
     INT, //123
@@ -32,6 +33,7 @@ enum class TokenType {
     IF, // if
     ELSE, // else
     RETURN,  // return
+    INVALID,
 };
 
 
@@ -89,6 +91,8 @@ static string convertTokenType(TokenType type) {
             return "else";
         case TokenType::RETURN:
             return "return";
+        case TokenType::INVALID:
+            return "invalid";
         default:
             return "unknown";
     }
@@ -111,6 +115,11 @@ struct Token {
             value = s;
         } 
 
+        bool operator==(const Token& t) const {
+            return t.value == value && t.type == type;
+        
+        }
+
         string strings() const { 
             return "{Type:" + convertTokenType(type) + " Value: " + value + " }";
         }
@@ -120,7 +129,9 @@ struct Token {
 
 class Lex { 
     public:
-        Lex(const std::string& input): in_{input}, reading_pos_{0}, 
+        static unordered_map<string, TokenType> sReserveWord;
+
+        Lex(const string& input): in_{input}, reading_pos_{0}, 
                                        cur_input_pos_{-1} { 
             readChar();
         }
@@ -149,9 +160,44 @@ class Lex {
             } 
         }
 
+        string readIdentifier() { 
+            auto pos = cur_input_pos_;
+
+            while(isLetter(cur_char_)) { 
+                readChar();
+            }
+            return in_.substr(pos, cur_input_pos_ - pos);
+        }
+
         char getChar() {
             return cur_char_;
         }
+        
+        bool isLetter(char ch) const {
+            return ::isalpha(ch) || ch == '_';
+        }
+
+        TokenType lookupIdent(const string& s) {
+            auto it = sReserveWord.find(s);
+
+            if(it != sReserveWord.end()) { 
+                return it->second;
+            } else { 
+                return TokenType::IDENTIFIER;
+            }
+        }
+
+
+        string readNum() {
+            auto pos = cur_input_pos_; 
+
+            while(::isdigit(cur_char_)) { 
+                readChar();
+            }
+            return in_.substr(pos, cur_input_pos_ - pos);
+        }
+        
+
     public:
         Token getNextToken(); 
 
@@ -159,7 +205,7 @@ class Lex {
         Lex(const Lex& ) = delete;
         Lex& operator=(const Lex&) = delete;
 
-    private: 
+    public:
         const std::string in_; 
         int cur_input_pos_; 
         int reading_pos_; // current reading input after current char

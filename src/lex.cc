@@ -1,4 +1,17 @@
 #include "lex.h"
+#include <cctype>
+using namespace std;
+
+
+unordered_map<string, TokenType> Lex::sReserveWord = { 
+    {"fn", TokenType::FUNCTION},
+    {"let", TokenType::LET},
+    {"return", TokenType::RETURN},
+    {"true", TokenType::TRUE},
+    {"false", TokenType::FALSE},
+    {"if", TokenType::IF},
+    {"else", TokenType::ELSE},
+};
 
 Token Lex::getNextToken() {
     skipWhitespace();
@@ -7,7 +20,7 @@ Token Lex::getNextToken() {
     switch(ch) {
         case '=': 
             if(peekChar() == '=') { 
-                getChar();
+                readChar();
                 s.set("==",TokenType::EQUAL); 
             }  else {
                 s.set("=", TokenType::ASSIGN);
@@ -69,10 +82,17 @@ Token Lex::getNextToken() {
             s.set("", TokenType::EndOfLine);
             break;
         default: 
-            break;
-            
+            if(isLetter(ch)) { 
+                auto value  = readIdentifier();
+                s.set(value, lookupIdent(value));
+            } else if(::isdigit(ch)) {
+                auto num = readNum(); 
+                s.set(num, TokenType::INT);
+            } else { 
+                s.set(string(1, ch), TokenType::INVALID); 
+            }
+            return s;
     } 
+    readChar();
     return s;
-}
-
-
+} 
