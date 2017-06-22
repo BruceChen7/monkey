@@ -46,7 +46,7 @@ static string convertTokenType(TokenType type) {
         case TokenType::ASSIGN:
             return "=";
         case TokenType::IDENTIFIER:
-            return "ident";
+            return "identifier";
         case TokenType::PLUS:
             return "+";
         case TokenType::MINUES:

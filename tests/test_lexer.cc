@@ -61,7 +61,7 @@ vector<vector<Token>> res =  {
         { "y", TokenType::IDENTIFIER },
         { "}", TokenType::RBRACE },
         { ";", TokenType::SEMICOLON },
-         { "", TokenType::EndOfLine }
+        { "", TokenType::EndOfLine }
     }
 
 };
