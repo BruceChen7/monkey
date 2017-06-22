@@ -11,14 +11,25 @@
 
 using namespace std;
 
+enum class Priority { 
+    LOWEST, //
+    EQUALS,  // == 
+    LESSGREATER, // > or <
+    SUM, // + 
+    PRODUCT, // * 
+    PREFIX,  // - or !
+    CALL, // myfunction();
+};
 
 class Parser {
     public: 
-        using prefixParserFn = std::function<void(int)>;
-        using infixParserFn = std::function<void(int)>;
+        using prefixParserFn = std::function<Expression*()>;
+        using infixParserFn = std::function<Expression*(Expression*)>;
         Parser(const string& s):l_(std::move(unique_ptr<Lex>(new Lex(s)))) { 
             nextToken();
             nextToken();
+            registerPrefixFn(TokenType::IDENTIFIER, std::bind(&Parser::parseIdenifier, this));
+            registerPrefixFn(TokenType::INT, std::bind(&Parser::parseIntegerLiteral, this));
         }
 
         Token nextToken() { 
@@ -27,11 +38,20 @@ class Parser {
             return cur_token_;
         } 
     public:
-        bool currentTokenIs(TokenType t) {
+        bool currentTokenIs(TokenType t) const {
             return cur_token_.type == t;
         }
-        bool peekTokenIs(TokenType t) {
+        bool peekTokenIs(TokenType t) const {
             return peek_token_.type == t;
+        }
+        void registerPrefixFn(TokenType t, prefixParserFn fn) {
+            int type = static_cast<int>(t);
+            pre_parser_fn_.insert(std::pair<int, prefixParserFn>(type, fn));
+        }
+
+        void registerInfixFn(TokenType t, infixParserFn fn) {
+            int type = static_cast<int>(t);
+            in_parser_fn_.insert(std::pair<int, infixParserFn>(type, fn));
         }
 
         bool expectPeek(TokenType t) {
@@ -42,8 +62,7 @@ class Parser {
                 peekError(t);
                 return false;
             }
-        }
-
+        } 
         void peekError(TokenType t) { 
             char buf[1024];
             ::snprintf(buf, sizeof(buf), "expect next token to be %s, got %s instead\n", 
@@ -60,7 +79,11 @@ class Parser {
         Statement* parseStatement();
         LetStatement* parseLetStatement();
         ReturnStatement* parseReturnStatement(); 
-
+        ExpressionStatement* parseExpressionStatement();
+        Expression* parseExpression(Priority p);
+        Expression* parseIdenifier(); 
+        Expression* parseIntegerLiteral();
+        Expression* parsePrefixExpression();
     private:
         unique_ptr<Lex> l_;
         vector<string> errors_;

@@ -26,7 +26,7 @@ Statement* Parser::parseStatement() {
         case TokenType::RETURN:
             return parseReturnStatement();
         default:
-            return nullptr; 
+            return parseExpressionStatement();
     }
 }
 
@@ -59,5 +59,37 @@ ReturnStatement* Parser::parseReturnStatement() {
     return rs;
 }
 
+ExpressionStatement* Parser::parseExpressionStatement() {
+    auto es = new ExpressionStatement(cur_token_);
+    es->setExpression(parseExpression(Priority::LOWEST));
+
+    if(peekTokenIs(TokenType::SEMICOLON)) {
+        nextToken();
+    }
+    return es;
+}
+
+Expression* Parser::parseExpression(Priority p) { 
+    auto pre_it = pre_parser_fn_.find(static_cast<int>(cur_token_.type));
+
+    if(pre_it == pre_parser_fn_.end()) {
+        return nullptr;
+    } else {
+        
+    } 
+}
 
 
+Expression* Parser::parseIdenifier() { 
+    return new IdentifierNode(cur_token_, cur_token_.value);
+}
+
+Expression* Parser::parseIntegerLiteral() { 
+    auto v = std::atol(cur_token_.value.c_str());
+    return new IntegerLiteral(cur_token_, v); 
+}
+
+Expression* Parser::parsePrefixExpression() { 
+    auto right = parseExpression(Priority::PREFIX); 
+    return new PrefixExpression(cur_token_, cur_token_.value, right);
+}

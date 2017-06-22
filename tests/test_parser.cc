@@ -10,10 +10,13 @@ vector<string> tests = {
 };
 
 static void checkParseErros(Parser* p) { 
+    static int i = 0;
     auto errors =  p->getErrors();
+
+    i++;
     
     if (errors.empty()) { 
-        cout << "all tests are success" << endl;
+        cout << "test " << i << " are success" << endl;
         return;
     } else { 
         cout << "parser has " << errors.size() << " errors " << endl;
@@ -29,7 +32,7 @@ int main() {
 
     for(const auto& t : tests) {
        unique_ptr<Parser> p(new Parser(t)); 
-       p->parseProgram();
+       auto program = unique_ptr<Program>(p->parseProgram());
        checkParseErros(p.get());
     }
 }
