@@ -86,11 +86,21 @@ Expression* Parser::parseExpression(Priority p) {
         return nullptr;
     } else { 
           auto pre_fn = pre_it->second; 
-          auto left_expr = pre_fn();
+          auto left_expr = pre_fn(); 
+          auto int_p  = static_cast<int>(p);
+          auto int_peek_p = static_cast<int>(peekPriority());
 
-          // while(peekTokenIs(token.SEMICOLON) && ) { 
-          // }
+          while(!peekTokenIs(TokenType::SEMICOLON) && int_p < int_peek_p) { 
+              auto in_fn_iter = in_parser_fn_.find(static_cast<int>(peek_token_.type));
 
+              if(in_fn_iter != in_parser_fn_.end()) { 
+                  return left_expr;
+              }
+              nextToken();
+              auto infix_fn = in_fn_iter->second;
+              left_expr = infix_fn(left_expr);
+          } 
+          return left_expr;
     } 
 } 
 Priority Parser::peekPriority() const {
@@ -99,7 +109,7 @@ Priority Parser::peekPriority() const {
     if (it != sPriority.end()) {
         return it->second;
     } else {
-        Priority::LOWEST;
+        return Priority::LOWEST;
     }
 }
 
@@ -109,7 +119,7 @@ Priority Parser::currentPrioriy() const {
     if (it != sPriority.end()) {
         return it->second;
     } else {
-        Priority::LOWEST;
+        return Priority::LOWEST;
     } 
 }
 
@@ -128,7 +138,11 @@ Expression* Parser::parsePrefixExpression() {
 }
    
 
-Expression* Parser::parseInprefixExpression(Expression* ) { 
-
+Expression* Parser::parseInprefixExpression(Expression* left) { 
+    auto t = cur_token_;
+    Priority curr_pri = currentPrioriy();
+    nextToken();
+    Expression* right = parseExpression(curr_pri);
+    return new InfixExpression(t, t.value, left, right);
 }
 

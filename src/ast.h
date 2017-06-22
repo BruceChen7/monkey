@@ -156,6 +156,19 @@ class PrefixExpression: public Expression {
 };
 
 class InfixExpression: public Expression { 
+    public:
+        virtual void expressionNode() override {}
+        virtual string tokenLiteral() override { 
+            return token_.value;
+        }
+        virtual string toString() override { 
+            stringstream ss;
+            ss << "(";
+            ss << left_->toString() << " " ;
+            ss << op_ << " "<< right_->toString() << ")" ;
+            
+            return ss.str(); 
+        }
     public: 
         InfixExpression(const Token& t, const string& op, Expression* l, Expression* r):token_(t),op_(op) {
             left_.reset(l);
