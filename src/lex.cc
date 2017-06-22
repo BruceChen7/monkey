@@ -3,7 +3,7 @@
 using namespace std;
 
 
-unordered_map<string, TokenType> Lex::sReserveWord = { 
+const unordered_map<string, TokenType> Lex::sReserveWord = { 
     {"fn", TokenType::FUNCTION},
     {"let", TokenType::LET},
     {"return", TokenType::RETURN},
@@ -73,6 +73,7 @@ Token Lex::getNextToken() {
             }
         case '<':
             if(peekChar() == '=') { 
+                readChar();
                 s.set("<=", TokenType::LESSEQUAL);
             } else { 
                 s.set("<", TokenType::LESS);

@@ -21,15 +21,32 @@ enum class Priority {
     CALL, // myfunction();
 };
 
+struct EnumClassHash {
+    template <typename T>
+    std::size_t operator()(T t) const {
+        return static_cast<std::size_t>(t);
+    }
+};
+
 class Parser {
     public: 
         using prefixParserFn = std::function<Expression*()>;
         using infixParserFn = std::function<Expression*(Expression*)>;
+
+        const static unordered_map<TokenType, Priority, EnumClassHash> sPriority;
+        
+
         Parser(const string& s):l_(std::move(unique_ptr<Lex>(new Lex(s)))) { 
             nextToken();
             nextToken();
             registerPrefixFn(TokenType::IDENTIFIER, std::bind(&Parser::parseIdenifier, this));
             registerPrefixFn(TokenType::INT, std::bind(&Parser::parseIntegerLiteral, this));
+            registerInfixFn(TokenType::PLUS, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
+            registerInfixFn(TokenType::MINUES, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
+            registerInfixFn(TokenType::DIVIDE, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
+            registerInfixFn(TokenType::EQUAL, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
+            registerInfixFn(TokenType::LESS, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
+            registerInfixFn(TokenType::GREAT, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
         }
 
         Token nextToken() { 
@@ -74,6 +91,10 @@ class Parser {
             return errors_;
         }
 
+    public: 
+        Priority peekPriority() const ; 
+        Priority currentPrioriy() const ;
+
     public:
         Program* parseProgram();
         Statement* parseStatement();
@@ -84,6 +105,7 @@ class Parser {
         Expression* parseIdenifier(); 
         Expression* parseIntegerLiteral();
         Expression* parsePrefixExpression();
+        Expression* parseInprefixExpression(Expression* );
     private:
         unique_ptr<Lex> l_;
         vector<string> errors_;

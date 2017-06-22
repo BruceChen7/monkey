@@ -129,7 +129,7 @@ struct Token {
 
 class Lex { 
     public:
-        static unordered_map<string, TokenType> sReserveWord;
+        const static unordered_map<string, TokenType> sReserveWord;
 
         Lex(const string& input): in_{input}, reading_pos_{0}, 
                                        cur_input_pos_{-1} { 

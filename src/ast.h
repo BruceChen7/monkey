@@ -142,7 +142,7 @@ class PrefixExpression: public Expression {
         virtual string toString() override { 
             stringstream ss;
             ss << "(" << operator_ << expr_->toString() << ")" ;
-            ss.str(); 
+            return ss.str(); 
         }
     public:
         PrefixExpression(const Token& t, string op, Expression* e):token_(t), operator_(op) {
@@ -153,6 +153,19 @@ class PrefixExpression: public Expression {
         Token token_;
         string operator_;
         unique_ptr<Expression> expr_;
+};
+
+class InfixExpression: public Expression { 
+    public: 
+        InfixExpression(const Token& t, const string& op, Expression* l, Expression* r):token_(t),op_(op) {
+            left_.reset(l);
+            right_.reset(r);
+        }
+    private:
+        Token token_; 
+        unique_ptr<Expression> left_;
+        string op_;
+        unique_ptr<Expression> right_;
 };
 
 class IdentifierNode : public Expression {

@@ -2,6 +2,16 @@
 #include "lex.h"
 #include "ast.h"
 
+
+const unordered_map<TokenType, Priority, EnumClassHash> Parser::sPriority = {
+    {TokenType::EQUAL, Priority::EQUALS},
+    {TokenType::NOTEQUAL, Priority::EQUALS},
+    {TokenType::LESS, Priority::LESSGREATER},
+    {TokenType::GREAT, Priority::LESSGREATER},
+    {TokenType::DIVIDE, Priority::PRODUCT},
+    {TokenType::PRODUCT, Priority::PRODUCT},
+};
+
 Program* Parser::parseProgram() { 
     auto t = cur_token_; 
     Program* p = new Program();
@@ -74,11 +84,34 @@ Expression* Parser::parseExpression(Priority p) {
 
     if(pre_it == pre_parser_fn_.end()) {
         return nullptr;
-    } else {
-        
+    } else { 
+          auto pre_fn = pre_it->second; 
+          auto left_expr = pre_fn();
+
+          // while(peekTokenIs(token.SEMICOLON) && ) { 
+          // }
+
     } 
+} 
+Priority Parser::peekPriority() const {
+    auto it = sPriority.find(peek_token_.type);
+
+    if (it != sPriority.end()) {
+        return it->second;
+    } else {
+        Priority::LOWEST;
+    }
 }
 
+Priority Parser::currentPrioriy() const {
+    auto it = sPriority.find(cur_token_.type);
+
+    if (it != sPriority.end()) {
+        return it->second;
+    } else {
+        Priority::LOWEST;
+    } 
+}
 
 Expression* Parser::parseIdenifier() { 
     return new IdentifierNode(cur_token_, cur_token_.value);
@@ -93,3 +126,9 @@ Expression* Parser::parsePrefixExpression() {
     auto right = parseExpression(Priority::PREFIX); 
     return new PrefixExpression(cur_token_, cur_token_.value, right);
 }
+   
+
+Expression* Parser::parseInprefixExpression(Expression* ) { 
+
+}
+
