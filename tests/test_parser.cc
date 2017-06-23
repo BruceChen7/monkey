@@ -9,6 +9,17 @@ vector<string> tests = {
     "return 1;" 
 };
 
+struct TestExpresion {
+    string expr;
+    string res;
+    TestExpresion(const string& e, const string& r): expr(e), res(r) {}
+}; 
+
+vector<TestExpresion> testOperationPrecedenceSets  = { 
+    { "-a * b", "((-a) * b)"},
+    {"!-a", "(!(-a))"} 
+};
+
 static void checkParseErros(Parser* p) { 
     static int i = 0;
     auto errors =  p->getErrors();
@@ -34,5 +45,17 @@ int main() {
        unique_ptr<Parser> p(new Parser(t)); 
        auto program = unique_ptr<Program>(p->parseProgram());
        checkParseErros(p.get());
+    }
+
+    cout << "Tests for Operator Precedence" << "\n";
+
+    for(const auto& t : testOperationPrecedenceSets) {
+       unique_ptr<Parser> p(new Parser(t.expr)); 
+       auto program = unique_ptr<Program>(p->parseProgram()); 
+       auto res = program->toString();
+
+       if (res != t.expr) { 
+           cout << "expected = " << t.res << " got = " << res << "\n";
+       }
     }
 }

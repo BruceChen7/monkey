@@ -41,10 +41,15 @@ class Parser {
             nextToken();
             registerPrefixFn(TokenType::IDENTIFIER, std::bind(&Parser::parseIdenifier, this));
             registerPrefixFn(TokenType::INT, std::bind(&Parser::parseIntegerLiteral, this));
+            registerPrefixFn(TokenType::BANG, std::bind(&Parser::parsePrefixExpression, this));
+            registerPrefixFn(TokenType::MINUES, std::bind(&Parser::parsePrefixExpression, this));
+
             registerInfixFn(TokenType::PLUS, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
             registerInfixFn(TokenType::MINUES, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
+            registerInfixFn(TokenType::PRODUCT, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
             registerInfixFn(TokenType::DIVIDE, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
             registerInfixFn(TokenType::EQUAL, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
+            registerInfixFn(TokenType::NOTEQUAL, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
             registerInfixFn(TokenType::LESS, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
             registerInfixFn(TokenType::GREAT, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
         }

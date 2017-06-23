@@ -45,7 +45,7 @@ class Program : public ASTNode {
             for(auto& s : statements_) {
                 ss << s->toString();
             }
-            ss.str();
+            return ss.str();
         } 
         virtual string tokenLiteral() override { 
             if(!statements_.empty())  {

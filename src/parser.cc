@@ -93,7 +93,7 @@ Expression* Parser::parseExpression(Priority p) {
           while(!peekTokenIs(TokenType::SEMICOLON) && int_p < int_peek_p) { 
               auto in_fn_iter = in_parser_fn_.find(static_cast<int>(peek_token_.type));
 
-              if(in_fn_iter != in_parser_fn_.end()) { 
+              if(in_fn_iter == in_parser_fn_.end()) { 
                   return left_expr;
               }
               nextToken();
@@ -103,6 +103,7 @@ Expression* Parser::parseExpression(Priority p) {
           return left_expr;
     } 
 } 
+
 Priority Parser::peekPriority() const {
     auto it = sPriority.find(peek_token_.type);
 
@@ -133,8 +134,11 @@ Expression* Parser::parseIntegerLiteral() {
 }
 
 Expression* Parser::parsePrefixExpression() { 
+    auto t = cur_token_;
+    nextToken();
     auto right = parseExpression(Priority::PREFIX); 
-    return new PrefixExpression(cur_token_, cur_token_.value, right);
+    
+    return new PrefixExpression(t,t.value, right);
 }
    
 
