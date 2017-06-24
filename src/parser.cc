@@ -104,6 +104,7 @@ Expression* Parser::parseExpression(Priority p) {
               nextToken();
               auto infix_fn = in_fn_iter->second;
               left_expr = infix_fn(left_expr);
+              int_peek_p = static_cast<int>(peekPriority());
           } 
           return left_expr;
     } 
