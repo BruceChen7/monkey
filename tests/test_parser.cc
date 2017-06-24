@@ -17,7 +17,17 @@ struct TestExpresion {
 
 vector<TestExpresion> testOperationPrecedenceSets  = { 
     { "-a * b", "((-a) * b)"},
-    {"!-a", "(!(-a))"} 
+    {"!-a", "(!(-a))"},
+    {"a+b+c", "((a + b) + c)"},
+    {"a+b-c", "((a + b) - c)"},
+    {"a*b*c", "((a * b) * c)"},
+    {"a*b/c", "((a * b) / c)"},
+    {"a-b/c", "(a - (b / c))"},
+    {"a+b*c+d/e-f", "(((a + (b * c)) + (d / e)) - f)"},
+    {"3+4; -5 * 5", "(3 + 4)((-5) * 5)"},
+    {"5>4==3<4", "((5 > 4) == (3 < 4))"},
+    {"5>4!=3<4", "((5 > 4) != (3 < 4))"},
+    {"3+4*5==3*1+4*5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
 };
 
 static void checkParseErros(Parser* p) { 
@@ -40,6 +50,7 @@ static void checkParseErros(Parser* p) {
 }
 
 int main() { 
+    cout << "Tests for statement parsing " << endl;
 
     for(const auto& t : tests) {
        unique_ptr<Parser> p(new Parser(t)); 
@@ -49,13 +60,23 @@ int main() {
 
     cout << "Tests for Operator Precedence" << "\n";
 
+    int i = 0; 
     for(const auto& t : testOperationPrecedenceSets) {
        unique_ptr<Parser> p(new Parser(t.expr)); 
        auto program = unique_ptr<Program>(p->parseProgram()); 
        auto res = program->toString();
 
-       if (res != t.expr) { 
-           cout << "expected = " << t.res << " got = " << res << "\n";
+       if (res != t.res) { 
+           cout << "expected = " << t.res << ",  got = " << res << "\n"; 
+           i++;
        }
+       
     }
+
+    if(i) {
+        cout << i << " Tests are failed " << endl; 
+    } else {
+        cout << "All tests are passed " << endl;
+    }
+    return 0;
 }

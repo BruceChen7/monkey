@@ -10,6 +10,11 @@ const unordered_map<TokenType, Priority, EnumClassHash> Parser::sPriority = {
     {TokenType::GREAT, Priority::LESSGREATER},
     {TokenType::DIVIDE, Priority::PRODUCT},
     {TokenType::PRODUCT, Priority::PRODUCT},
+    {TokenType::PLUS, Priority::SUM},
+    {TokenType::MINUES, Priority::SUM},
+    {TokenType::BANG, Priority::PREFIX},
+    {TokenType::LESSEQUAL, Priority::LESSGREATER},
+    {TokenType::GREATEQUAL, Priority::LESSGREATER},
 };
 
 Program* Parser::parseProgram() { 

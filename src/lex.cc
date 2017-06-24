@@ -69,8 +69,9 @@ Token Lex::getNextToken() {
                 readChar();
                 s.set(">=", TokenType::GREATEQUAL);
             } else {
-                s.set(">", TokenType::ASSIGN);
+                s.set(">", TokenType::GREAT);
             }
+            break;
         case '<':
             if(peekChar() == '=') { 
                 readChar();

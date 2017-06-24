@@ -8,7 +8,9 @@ using namespace std;
 vector<string> tests = { 
     "let x = 1;",
     "if(x < y) x = 1; else { y = 1; }",
-    "let add = fn(x, y) { return x + y }; " 
+    "let add = fn(x, y) { return x + y }; " ,
+    "-a * b;",
+    "-a * b",
 };
 
 
@@ -62,8 +64,24 @@ vector<vector<Token>> res =  {
         { "}", TokenType::RBRACE },
         { ";", TokenType::SEMICOLON },
         { "", TokenType::EndOfLine }
-    }
+    },
 
+    {
+        {"-", TokenType::MINUES },
+        {"a", TokenType::IDENTIFIER }, 
+        {"*", TokenType::PRODUCT }, 
+        {"b", TokenType::IDENTIFIER }, 
+        {";", TokenType::SEMICOLON }, 
+        {"", TokenType::EndOfLine }, 
+    },
+
+    {
+        {"-", TokenType::MINUES },
+        {"a", TokenType::IDENTIFIER }, 
+        {"*", TokenType::PRODUCT }, 
+        {"b", TokenType::IDENTIFIER }, 
+        {"", TokenType::EndOfLine }, 
+    }
 };
 
 static bool verify(const vector<Token>& tokens, int i) { 

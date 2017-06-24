@@ -137,6 +137,8 @@ class Lex {
         }
         void readChar() { 
             if (reading_pos_ >= in_.size()) { 
+                cur_input_pos_ = in_.size();
+                reading_pos_++; 
                 cur_char_ = '\0';
                 return;
             } else {
@@ -165,7 +167,7 @@ class Lex {
 
             while(isLetter(cur_char_)) { 
                 readChar();
-            }
+            } 
             return in_.substr(pos, cur_input_pos_ - pos);
         }
 
