@@ -84,10 +84,17 @@ ExpressionStatement* Parser::parseExpressionStatement() {
     return es;
 }
 
+void Parser::noPrefixParserFnError(TokenType t) { 
+    stringstream ss;
+    ss << "no prefix parse function for " << convertTokenType(t) << "found" << endl;
+    errors_.push_back(ss.str());
+}
+
 Expression* Parser::parseExpression(Priority p) { 
     auto pre_it = pre_parser_fn_.find(static_cast<int>(cur_token_.type));
 
     if(pre_it == pre_parser_fn_.end()) {
+        noPrefixParserFnError(cur_token_.type);
         return nullptr;
     } else { 
           auto pre_fn = pre_it->second; 
@@ -143,7 +150,6 @@ Expression* Parser::parsePrefixExpression() {
     auto t = cur_token_;
     nextToken();
     auto right = parseExpression(Priority::PREFIX); 
-    
     return new PrefixExpression(t, t.value, right);
 }
    
@@ -159,4 +165,14 @@ Expression* Parser::parseInprefixExpression(Expression* left) {
 Expression* Parser::parseBooleanExpression() { 
     bool v = (cur_token_.value == "true" ? true : false);
     return new Boolean(cur_token_, v);
+}
+   
+Expression* Parser::parseGroupedExpression() { 
+    nextToken(); // skip (
+    auto expr = parseExpression(Priority::LOWEST);
+
+    if (!expectPeek(TokenType::RPAREN)) {
+        return nullptr;
+    }
+    return expr;
 }

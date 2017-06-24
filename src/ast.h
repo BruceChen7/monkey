@@ -247,6 +247,25 @@ class Boolean: public Expression {
         bool value_;
 };
 
+class BlockStatement: public Statement {
+    public:
+        virtual string tokenLiteral() override { 
+            return token_.value;
+        }
+        virtual string toString() override { 
+            stringstream ss;
+
+            for(const auto& it : statements_) {
+                ss << it->toString();
+            }
+            return ss.str();
+        }
+    private: 
+        Token token_; // "{" token 
+        vector<unique_ptr<Statement>> statements_;
+
+};
+
 class IfExpression: public Expression {
     public:
         virtual void expressionNode() override {}
@@ -254,11 +273,19 @@ class IfExpression: public Expression {
             return token_.value;
         }
         virtual string toString() override { 
-            return token_.value;
+            stringstream ss;
+            ss << "if " << cond_->toString() << " " << consequence_->toString() ;
+
+            if (alternative_ != nullptr) {
+                ss << alternative_->toString(); 
+            } 
+            return ss.str(); 
         } 
    private:
         Token token_; 
         unique_ptr<Expression> cond_; 
+        unique_ptr<BlockStatement> consequence_;
+        unique_ptr<BlockStatement> alternative_;
 
 };
 

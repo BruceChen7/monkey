@@ -29,6 +29,10 @@ vector<TestExpresion> testOperationPrecedenceSets  = {
     {"5>4==3<4", "((5 > 4) == (3 < 4))"},
     {"5>4!=3<4", "((5 > 4) != (3 < 4))"},
     {"3+4*5==3*1+4*5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
+    {"1+(2+3)+4", "((1 + (2 + 3)) + 4)"},
+    {"(2+3)*4", "((2 + 3) * 4)"},
+    {"!(5+5)", "(!(5 + 5))"},
+    {"!(true == false)", "(!(true == false))"},
 };
 
 
@@ -119,5 +123,6 @@ int main() {
        checkParseErros(p.get());
     } 
     testPrefixExpresion();
+    testOperationPrecedence();
     return 0;
 }
