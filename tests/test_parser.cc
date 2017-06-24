@@ -1,6 +1,7 @@
 #include "parser.h" 
 #include <memory> 
 #include <iostream>
+#include <cassert>
 using namespace std;
 
 vector<string> tests = { 
@@ -30,6 +31,21 @@ vector<TestExpresion> testOperationPrecedenceSets  = {
     {"3+4*5==3*1+4*5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
 };
 
+
+struct TestPrefixExpression { 
+    string input;
+    string op;
+    string value;
+    TestPrefixExpression(const string& in, const string& o, const string& v):input(in), op(o), value(v) {}
+};
+
+vector<TestPrefixExpression> testPrefixExpressionSet = { 
+    {"!5", "!", "5"},
+    {"-51", "-", "51"},
+    {"!true", "!", "true"},
+    {"!false", "!", "false"},
+};
+
 static void checkParseErros(Parser* p) { 
     static int i = 0;
     auto errors =  p->getErrors();
@@ -49,15 +65,29 @@ static void checkParseErros(Parser* p) {
 
 }
 
-int main() { 
-    cout << "Tests for statement parsing " << endl;
 
-    for(const auto& t : tests) {
-       unique_ptr<Parser> p(new Parser(t)); 
-       auto program = unique_ptr<Program>(p->parseProgram());
-       checkParseErros(p.get());
-    }
+static void testPrefixExpresion() { 
+    cout << "Tests for PrefixExpression parsing " << endl;
 
+    for(const auto& t : testPrefixExpressionSet) { 
+        unique_ptr<Parser> p(new Parser(t.input)); 
+        auto program = unique_ptr<Program>(p->parseProgram());
+        checkParseErros(p.get());
+        auto s = program->getStatements(); 
+        assert(s->size() == 1); 
+        ExpressionStatement* pes = dynamic_cast<ExpressionStatement*>(s->front().get());
+        auto expr = pes->getExpression(); 
+        PrefixExpression* pre_expr = dynamic_cast<PrefixExpression*>(expr); 
+        assert(pre_expr->getOP() == t.op); 
+        auto operand = pre_expr->getExpression()->toString();
+
+        if(operand != t.value ) { 
+           cout << "expect " << t.value  << ", get " << operand << "\n";
+        }
+    } 
+}
+
+static void testOperationPrecedence() {
     cout << "Tests for Operator Precedence" << "\n";
 
     int i = 0; 
@@ -71,12 +101,23 @@ int main() {
            i++;
        }
        
-    }
+    } 
 
     if(i) {
         cout << i << " Tests are failed " << endl; 
     } else {
-        cout << "All tests are passed " << endl;
-    }
+        cout << "All Operator Precedence tests are passed " << endl;
+    } 
+}
+
+int main() { 
+    cout << "Tests for statement parsing " << endl;
+
+    for(const auto& t : tests) {
+       unique_ptr<Parser> p(new Parser(t)); 
+       auto program = unique_ptr<Program>(p->parseProgram());
+       checkParseErros(p.get());
+    } 
+    testPrefixExpresion();
     return 0;
 }

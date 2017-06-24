@@ -10,8 +10,6 @@
 using namespace std;
 
 class IdentifierNode;
-class IdentifierNode;
-class ExpressionStatement;
 
 class ASTNode { 
     public:
@@ -52,6 +50,11 @@ class Program : public ASTNode {
                 return statements_[0]->tokenLiteral();
             }
         }
+
+        const vector<unique_ptr<Statement>>* getStatements() const {
+            return &statements_;
+        }
+
     public:
         virtual ~Program() = default;
     private:
@@ -128,6 +131,9 @@ class ExpressionStatement: public Statement {
         void setExpression(Expression* e) { 
             expr_ = std::move(unique_ptr<Expression>(e));
         }
+        Expression* getExpression() const {
+            return expr_.get();
+        }
     private:
         Token token_; 
         std::unique_ptr<Expression> expr_;
@@ -147,6 +153,12 @@ class PrefixExpression: public Expression {
     public:
         PrefixExpression(const Token& t, string op, Expression* e):token_(t), operator_(op) {
             expr_.reset(e); 
+        }
+        const string& getOP() const {
+            return operator_;
+        }
+        Expression* getExpression() const {
+            return expr_.get();
         }
         
     private:
@@ -217,6 +229,37 @@ class IntegerLiteral: public Expression {
     private:
         Token token_;
         int64_t value_;
+};
+
+class Boolean: public Expression { 
+    public:
+        virtual void expressionNode() override {}
+        virtual string tokenLiteral() override { 
+            return token_.value;
+        }
+        virtual string toString() override { 
+            return token_.value;
+        } 
+        Boolean(const Token& t, bool v): token_(t), value_(v) { }
+
+    private:
+        Token token_;
+        bool value_;
+};
+
+class IfExpression: public Expression {
+    public:
+        virtual void expressionNode() override {}
+        virtual string tokenLiteral() override { 
+            return token_.value;
+        }
+        virtual string toString() override { 
+            return token_.value;
+        } 
+   private:
+        Token token_; 
+        unique_ptr<Expression> cond_; 
+
 };
 
 #endif

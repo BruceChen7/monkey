@@ -144,7 +144,7 @@ Expression* Parser::parsePrefixExpression() {
     nextToken();
     auto right = parseExpression(Priority::PREFIX); 
     
-    return new PrefixExpression(t,t.value, right);
+    return new PrefixExpression(t, t.value, right);
 }
    
 
@@ -156,3 +156,7 @@ Expression* Parser::parseInprefixExpression(Expression* left) {
     return new InfixExpression(t, t.value, left, right);
 }
 
+Expression* Parser::parseBooleanExpression() { 
+    bool v = (cur_token_.value == "true" ? true : false);
+    return new Boolean(cur_token_, v);
+}

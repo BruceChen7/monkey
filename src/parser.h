@@ -43,6 +43,8 @@ class Parser {
             registerPrefixFn(TokenType::INT, std::bind(&Parser::parseIntegerLiteral, this));
             registerPrefixFn(TokenType::BANG, std::bind(&Parser::parsePrefixExpression, this));
             registerPrefixFn(TokenType::MINUES, std::bind(&Parser::parsePrefixExpression, this));
+            registerPrefixFn(TokenType::TRUE, std::bind(&Parser::parseBooleanExpression, this));
+            registerPrefixFn(TokenType::FALSE, std::bind(&Parser::parseBooleanExpression, this));
 
             registerInfixFn(TokenType::PLUS, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
             registerInfixFn(TokenType::MINUES, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
@@ -111,6 +113,7 @@ class Parser {
         Expression* parseIntegerLiteral();
         Expression* parsePrefixExpression();
         Expression* parseInprefixExpression(Expression* );
+        Expression* parseBooleanExpression();
     private:
         unique_ptr<Lex> l_;
         vector<string> errors_;
