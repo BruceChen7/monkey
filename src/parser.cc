@@ -176,3 +176,51 @@ Expression* Parser::parseGroupedExpression() {
     }
     return expr;
 }
+
+Expression* Parser::parseIfExpression() {
+    auto if_token = cur_token_;
+
+    if(!expectPeek(TokenType::LPAREN)) {
+        return nullptr;
+    }
+    nextToken(); 
+    auto condition_expr = parseExpression(Priority::LOWEST);
+
+    if(!expectPeek(TokenType::RPAREN)) { 
+        return nullptr;
+    }
+
+    if(!expectPeek(TokenType::LBRACE)) { 
+        return nullptr;
+    }
+
+    auto cons = parseBlockStatement(); 
+    BlockStatement* alter = nullptr;
+
+    if(peekTokenIs(TokenType::ELSE)) {
+        nextToken(); 
+        if(!expectPeek(TokenType::LBRACE)) {
+            return nullptr;
+        } 
+        alter = parseBlockStatement();
+
+    }
+    return new IfExpression(if_token, condition_expr, cons, alter);
+}
+
+BlockStatement* Parser::parseBlockStatement() { 
+    auto t = cur_token_;
+    nextToken(); 
+    auto bs = new BlockStatement(t);
+
+
+    while(!currentTokenIs(TokenType::RBRACE)) { 
+        bs->addStatement(parseStatement());
+        nextToken();
+    }
+    return bs;
+}
+
+
+
+

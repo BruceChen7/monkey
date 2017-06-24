@@ -177,8 +177,7 @@ class InfixExpression: public Expression {
             stringstream ss;
             ss << "(";
             ss << left_->toString() << " " ;
-            ss << op_ << " "<< right_->toString() << ")" ;
-            
+            ss << op_ << " "<< right_->toString() << ")" ; 
             return ss.str(); 
         }
     public: 
@@ -224,8 +223,7 @@ class IntegerLiteral: public Expression {
             return token_.value;
         } 
     public:
-        IntegerLiteral(const Token& t, long long int v): token_(t), value_(v) {
-        }
+        IntegerLiteral(const Token& t, long long int v): token_(t), value_(v) { }
     private:
         Token token_;
         int64_t value_;
@@ -259,6 +257,13 @@ class BlockStatement: public Statement {
                 ss << it->toString();
             }
             return ss.str();
+        } 
+        virtual void statementNode() override { }
+        
+    public:
+        BlockStatement(const Token& t): token_(t) { }
+        void addStatement(Statement* ns) {
+            statements_.emplace_back(unique_ptr<Statement>(ns));
         }
     private: 
         Token token_; // "{" token 
@@ -281,6 +286,33 @@ class IfExpression: public Expression {
             } 
             return ss.str(); 
         } 
+        
+    public:
+        IfExpression(const Token& t, Expression* c, BlockStatement* cons, BlockStatement* alter = nullptr): token_(t) {
+            cond_.reset(c);
+            consequence_.reset(cons);
+            alternative_.reset(alter);
+        }
+        Token getToken() {
+            return token_;
+        }
+
+        Expression* getCondition() { 
+            return cond_.get();
+        } 
+
+        BlockStatement* getConsequence() {
+            return consequence_.get();
+        }
+
+        BlockStatement* getAlternative() {
+            if(alternative_ != nullptr ) {
+                return alternative_.get();
+            } else {
+                return nullptr;
+            }
+        }
+           
    private:
         Token token_; 
         unique_ptr<Expression> cond_; 

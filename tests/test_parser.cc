@@ -50,6 +50,27 @@ vector<TestPrefixExpression> testPrefixExpressionSet = {
     {"!false", "!", "false"},
 };
 
+struct TestIfExpression {
+    string input;
+    string if_token;
+    string condtion;
+    string consequence;
+    string alternative; 
+    TestIfExpression(const string& in, const string& if_tok, const string& cond, const string& cons, const string& alter=""):
+        input(in), if_token(if_tok), condtion(cond), consequence(cons), alternative(alter) { }
+
+    bool operator==(const TestIfExpression& o) { 
+        return (input == o.input) && (if_token == o.if_token) 
+            && (condtion == o.condtion) && (alternative == o.alternative);
+    }
+};
+
+vector<TestIfExpression> testIfExpression {
+    {"if(x < y)  { x }", "if", "(x < y)", "x", ""},
+    {"if(x < y)  { x } else { y }", "if", "(x < y)", "x", "y"},
+
+};
+
 static void checkParseErros(Parser* p) { 
     static int i = 0;
     auto errors =  p->getErrors();
@@ -67,8 +88,7 @@ static void checkParseErros(Parser* p) {
         }
     }
 
-}
-
+} 
 
 static void testPrefixExpresion() { 
     cout << "Tests for PrefixExpression parsing " << endl;
@@ -90,6 +110,37 @@ static void testPrefixExpresion() {
         }
     } 
 }
+
+static void testIfStatement() {
+    cout << "Tests for If statement " << "\n";
+
+    for(const auto& t : testIfExpression) {
+       unique_ptr<Parser> p(new Parser(t.input)); 
+       checkParseErros(p.get());
+       auto program = unique_ptr<Program>(p->parseProgram()); 
+       auto s = program->getStatements(); 
+       assert(s->size() == 1);
+       auto if_expr_statement = dynamic_cast<ExpressionStatement*>(s->front().get());
+       assert(if_expr_statement != nullptr);
+       IfExpression* if_expr = dynamic_cast<IfExpression*>(if_expr_statement->getExpression()); 
+       
+       BlockStatement* alter = if_expr->getAlternative(); 
+       string alter_str = "";
+       if(alter != nullptr) {
+            alter_str = alter->toString();
+       }
+
+       TestIfExpression test_if_expr {
+           t.input,
+           if_expr->getToken().value,
+           if_expr->getCondition()->toString(),
+           if_expr->getConsequence()->toString(), 
+           alter_str 
+       };
+       assert(test_if_expr == t); 
+   }
+} 
+
 
 static void testOperationPrecedence() {
     cout << "Tests for Operator Precedence" << "\n";
@@ -124,5 +175,6 @@ int main() {
     } 
     testPrefixExpresion();
     testOperationPrecedence();
+    testIfStatement();
     return 0;
 }
