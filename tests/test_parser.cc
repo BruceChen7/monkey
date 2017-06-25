@@ -165,6 +165,50 @@ static void testOperationPrecedence() {
     } 
 }
 
+
+struct TestParamParsing {
+    string input;
+    vector<string> params;
+    TestParamParsing(const string& in, const vector<string>& p): input(in), params(p) { }
+    bool operator==(const TestParamParsing& o) const  { 
+        return o.input == input && params == o.params;
+        
+    }
+};
+
+vector<TestParamParsing> testsForParams = {
+    {"fn() {}", {}},
+    {"fn(x) {}", {"x"}},
+    {"fn(x, y, z) {}", {"x", "y", "z"}},
+
+};
+
+static void testFuncParamParsing() { 
+    cout << "Tests for func param parsing " << endl; 
+
+    for(const auto& t : testsForParams) {
+       unique_ptr<Parser> p(new Parser(t.input)); 
+       auto program = unique_ptr<Program>(p->parseProgram());
+       checkParseErros(p.get());
+       auto s = program->getStatements(); 
+       assert(s->size() == 1);
+       auto func_expr_statement = dynamic_cast<ExpressionStatement*>(s->front().get());
+       assert(func_expr_statement != nullptr);
+       FunctionLiteral* func = dynamic_cast<FunctionLiteral*>(func_expr_statement->getExpression()); 
+       assert(func != nullptr);
+       const vector<unique_ptr<IdentifierNode>>& param = func->getParam(); 
+
+       vector<string> param_str{};
+       for(auto i = 0; i < param.size(); i++) { 
+           param_str.push_back(param[i]->toString());
+           cout << param[i]->toString() << endl;
+       }
+       TestParamParsing got{t.input, param_str};
+       assert(t == got);
+
+    } 
+}
+
 int main() { 
     cout << "Tests for statement parsing " << endl;
 
@@ -176,5 +220,6 @@ int main() {
     testPrefixExpresion();
     testOperationPrecedence();
     testIfStatement();
+    testFuncParamParsing();
     return 0;
 }

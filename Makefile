@@ -1,5 +1,5 @@
 CC := g++
-FLAGS := -g -I src -std=c++11
+FLAGS := -g -I  src -std=c++11
 
 SRC := $(wildcard src/*.cc)
 

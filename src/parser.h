@@ -47,6 +47,7 @@ class Parser {
             registerPrefixFn(TokenType::FALSE, std::bind(&Parser::parseBooleanExpression, this));
             registerPrefixFn(TokenType::LPAREN, std::bind(&Parser::parseGroupedExpression, this));
             registerPrefixFn(TokenType::IF, std::bind(&Parser::parseIfExpression, this));
+            registerPrefixFn(TokenType::FUNCTION, std::bind(&Parser::parseFunctionLiteral, this));
 
             registerInfixFn(TokenType::PLUS, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
             registerInfixFn(TokenType::MINUES, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
@@ -120,7 +121,9 @@ class Parser {
         void noPrefixParserFnError(TokenType t);
         Expression* parseIfExpression();
         BlockStatement* parseBlockStatement();
-    
+        Expression* parseFunctionLiteral();
+        vector<IdentifierNode*> parseFunctionParams(); 
+
     private:
         unique_ptr<Lex> l_;
         vector<string> errors_;

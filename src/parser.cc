@@ -3,6 +3,7 @@
 #include "ast.h"
 
 
+
 const unordered_map<TokenType, Priority, EnumClassHash> Parser::sPriority = {
     {TokenType::EQUAL, Priority::EQUALS},
     {TokenType::NOTEQUAL, Priority::EQUALS},
@@ -219,8 +220,48 @@ BlockStatement* Parser::parseBlockStatement() {
         nextToken();
     }
     return bs;
+} 
+
+Expression* Parser::parseFunctionLiteral() { 
+    auto t = cur_token_; 
+
+    if(!expectPeek(TokenType::LPAREN)) { 
+        return nullptr;
+    } 
+    auto param = parseFunctionParams(); 
+
+    if(!expectPeek(TokenType::LBRACE)) { 
+        return nullptr;
+    }
+
+    auto blocks = parseBlockStatement();
+    auto func = new FunctionLiteral(t, param, blocks); 
+    return func;
 }
 
+vector<IdentifierNode*> Parser::parseFunctionParams() {
+    vector<IdentifierNode*> param;
+    // no params
+    if(peekTokenIs(TokenType::RPAREN)) { 
+        nextToken();
+        return param;
+    } 
+    // skip "("
+    nextToken(); 
+    IdentifierNode* ident = new IdentifierNode(cur_token_, cur_token_.value); 
+    param.push_back(ident);
 
+    while(peekTokenIs(TokenType::COMMA)) {
+        // skip current param
+        nextToken();
+        // skip ","
+        nextToken();
+        IdentifierNode* i= new IdentifierNode(cur_token_, cur_token_.value); 
+        param.push_back(i); 
+    }
 
-
+    if(!expectPeek(TokenType::RPAREN)) {
+        return vector<IdentifierNode*>{};
+    } 
+    return param;
+} 

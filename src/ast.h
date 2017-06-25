@@ -7,6 +7,7 @@
 #include <memory>
 #include <sstream>
 #include <cstdint>
+#include <algorithm>
 using namespace std;
 
 class IdentifierNode;
@@ -319,6 +320,42 @@ class IfExpression: public Expression {
         unique_ptr<BlockStatement> consequence_;
         unique_ptr<BlockStatement> alternative_;
 
+};
+
+class FunctionLiteral: public Expression {
+    public:
+        virtual void expressionNode() override {}
+        virtual string tokenLiteral() override { 
+            return token_.value;
+        }
+        virtual string toString() override { 
+            stringstream ss;
+            ss << token_.value << "(";
+
+            for(int i = 0; i < para_.size(); i++) {
+                ss << para_[i]->toString();
+
+                if ( i != para_.size() - 1) {
+                    ss << ", ";
+                }
+            }
+            ss << ")"; 
+            ss << body_->toString();
+        } 
+    public:
+        FunctionLiteral(const Token& t, const vector<IdentifierNode*>& param, BlockStatement* body):token_(t) {
+            body_.reset(body);
+            std::transform(param.begin(), param.end(), std::back_inserter(para_), [](IdentifierNode* i) { 
+                    return std::move(unique_ptr<IdentifierNode>(i));
+            });
+        } 
+        const vector<unique_ptr<IdentifierNode>>& getParam() {
+            return para_;
+        }
+    private:
+        vector<unique_ptr<IdentifierNode>> para_;
+        Token token_;
+        unique_ptr<BlockStatement> body_;
 };
 
 #endif
