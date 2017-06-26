@@ -16,6 +16,7 @@ const unordered_map<TokenType, Priority, EnumClassHash> Parser::sPriority = {
     {TokenType::BANG, Priority::PREFIX},
     {TokenType::LESSEQUAL, Priority::LESSGREATER},
     {TokenType::GREATEQUAL, Priority::LESSGREATER},
+    {TokenType::LPAREN, Priority::CALL},
 };
 
 Program* Parser::parseProgram() { 
@@ -265,3 +266,32 @@ vector<IdentifierNode*> Parser::parseFunctionParams() {
     } 
     return param;
 } 
+
+Expression* Parser::parseCallExpression(Expression* func) { 
+    Token t = cur_token_; 
+    vector<Expression*> arguments = parseCallArguments(); 
+    return new CallExpression(t, arguments, func); 
+}
+
+
+vector<Expression*> Parser::parseCallArguments() { 
+    vector<Expression*> argument;
+
+    if(peekTokenIs(TokenType::RPAREN)) {
+        nextToken();
+        return argument;
+    }
+    nextToken();
+    argument.push_back(parseExpression(Priority::LOWEST));
+
+    while(peekTokenIs(TokenType::COMMA)) {
+        nextToken(); // skip ','
+        nextToken();
+        argument.push_back(parseExpression(Priority::LOWEST));
+    }
+
+    if(!expectPeek(TokenType::RPAREN)) {
+        return vector<Expression*> {};
+    }
+    return argument; 
+}

@@ -33,6 +33,8 @@ vector<TestExpresion> testOperationPrecedenceSets  = {
     {"(2+3)*4", "((2 + 3) * 4)"},
     {"!(5+5)", "(!(5 + 5))"},
     {"!(true == false)", "(!(true == false))"},
+    {"a+add(b*c)+d", "((a + add((b * c))) + d)"},
+    {"add(a+b+c*d/f+g)", "add((((a + b) + ((c * d) / f)) + g))"},
 };
 
 
@@ -201,7 +203,6 @@ static void testFuncParamParsing() {
        vector<string> param_str{};
        for(auto i = 0; i < param.size(); i++) { 
            param_str.push_back(param[i]->toString());
-           cout << param[i]->toString() << endl;
        }
        TestParamParsing got{t.input, param_str};
        assert(t == got);

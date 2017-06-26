@@ -349,6 +349,8 @@ class FunctionLiteral: public Expression {
                     return std::move(unique_ptr<IdentifierNode>(i));
             });
         } 
+        FunctionLiteral(const FunctionLiteral&) = delete;
+        FunctionLiteral&operator=(const FunctionLiteral&) = delete;
         const vector<unique_ptr<IdentifierNode>>& getParam() {
             return para_;
         }
@@ -358,4 +360,39 @@ class FunctionLiteral: public Expression {
         unique_ptr<BlockStatement> body_;
 };
 
-#endif
+class CallExpression: public Expression {
+    public:
+        virtual void expressionNode() override {}
+        virtual string tokenLiteral() override { 
+            return token_.value;
+        }
+        virtual string toString() override { 
+            stringstream ss;
+            ss << function_->toString() << "(";
+
+            for(int i = 0; i < arguments_.size(); i++) {
+                ss << arguments_[i]->toString();
+
+                if ( i != arguments_.size() - 1) {
+                    ss << ", ";
+                }
+            }
+            ss << ")"; 
+            return ss.str();
+        } 
+    public:
+        CallExpression(const CallExpression& o) = delete;
+        CallExpression& operator=(const CallExpression&) = delete;
+        CallExpression(const Token& t, const vector<Expression*> argu, const Expression* func): token_(t) {
+            function_.reset(const_cast<Expression*>(func));
+
+            transform(argu.begin(), argu.end(), back_inserter(arguments_), [](Expression* e) { 
+                    return std::move(unique_ptr<Expression>(e));
+            });
+        }
+    private:
+        Token token_; // "(" token
+        unique_ptr<Expression> function_; // function name
+        vector<unique_ptr<Expression>> arguments_;
+};
+#endif 

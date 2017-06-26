@@ -57,6 +57,7 @@ class Parser {
             registerInfixFn(TokenType::NOTEQUAL, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
             registerInfixFn(TokenType::LESS, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
             registerInfixFn(TokenType::GREAT, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
+            registerInfixFn(TokenType::LPAREN, std::bind(&Parser::parseCallExpression, this, placeholders::_1));
         }
 
         Token nextToken() { 
@@ -123,7 +124,8 @@ class Parser {
         BlockStatement* parseBlockStatement();
         Expression* parseFunctionLiteral();
         vector<IdentifierNode*> parseFunctionParams(); 
-
+        Expression* parseCallExpression(Expression* func);
+        vector<Expression*> parseCallArguments(); 
     private:
         unique_ptr<Lex> l_;
         vector<string> errors_;
