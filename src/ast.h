@@ -67,8 +67,13 @@ class LetStatement: public Statement {
         LetStatement(const Token& t): token_(t) { 
 
         }
+        string getName();
+        string getValue();
         void setName(IdentifierNode* name) {
             name_ = std::move(unique_ptr<IdentifierNode>(name)); 
+        }
+        void setExpression(Expression* e)  { 
+            value_.reset(e);
         }
 
     public: 
@@ -103,14 +108,16 @@ class ReturnStatement: public Statement {
         }
 
     public:
-        ReturnStatement(Token t): token_(t) { 
+        ReturnStatement(Token t, Expression* val): token_(t) { 
+            expression_.reset(val);
         }
+
         ReturnStatement(const ReturnStatement& ) = delete;
         ReturnStatement& operator=(const ReturnStatement&) = delete;
 
     private: 
         Token token_; // "let" token
-        Expression* expression_;
+        unique_ptr<Expression> expression_;
 };
 
 

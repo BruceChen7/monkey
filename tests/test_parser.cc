@@ -73,6 +73,9 @@ vector<TestIfExpression> testIfExpression {
 
 };
 
+
+
+
 static void checkParseErros(Parser* p) { 
     static int i = 0;
     auto errors =  p->getErrors();
@@ -91,6 +94,43 @@ static void checkParseErros(Parser* p) {
     }
 
 } 
+
+struct TestLetStatement {
+    string statement;
+    string name;
+    string val;
+    TestLetStatement(const string& s, const string& n, const string& v):statement(s), name(n), val(v) { }
+    bool operator==(const TestLetStatement& t) const {
+        return t.statement == statement && t.name == name && t.val == val;
+    }
+};
+
+vector<TestLetStatement> testsForLetStatement {
+    {"let x = 1;", "x", "1"},
+    {"let foo = bar;", "foo", "bar"},
+    {"let bar = true;", "bar", "true"}, 
+};
+
+static void testLetStatement() { 
+    cout << "Tests for Let statement " << endl;
+
+    for(const auto& t : testsForLetStatement) { 
+        unique_ptr<Parser> p(new Parser(t.statement)); 
+        auto program = unique_ptr<Program>(p->parseProgram());
+        checkParseErros(p.get());
+        auto s = program->getStatements(); 
+        assert(s->size() == 1); 
+        LetStatement* ls = dynamic_cast<LetStatement*>(s->front().get());
+        assert(ls != nullptr);
+        TestLetStatement test { 
+            t.statement,
+            ls->getName(),
+            ls->getValue() 
+        };
+        assert(test == t);
+    }
+
+}
 
 static void testPrefixExpresion() { 
     cout << "Tests for PrefixExpression parsing " << endl;
@@ -222,5 +262,6 @@ int main() {
     testOperationPrecedence();
     testIfStatement();
     testFuncParamParsing();
+    testLetStatement();
     return 0;
 }

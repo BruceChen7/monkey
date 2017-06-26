@@ -11,3 +11,11 @@ string LetStatement::toString() {
     ss << ";";
     return ss.str();
 }
+
+string LetStatement::getName() { 
+    return name_->toString(); 
+}
+
+string LetStatement::getValue() {
+    return value_->toString();
+}

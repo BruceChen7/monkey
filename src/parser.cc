@@ -58,8 +58,14 @@ LetStatement* Parser::parseLetStatement() {
     auto name = new IdentifierNode(cur_token_, cur_token_.value);
     ls->setName(name);
 
-    // FixMe parse Expression
-    while(!currentTokenIs(TokenType::SEMICOLON) && !currentTokenIs(TokenType::EndOfLine)) {
+    if(!expectPeek(TokenType::ASSIGN)) { 
+        return nullptr;
+    } 
+    nextToken();
+    auto value = parseExpression(Priority::LOWEST);
+    ls->setExpression(value);
+
+    if(peekTokenIs(TokenType::SEMICOLON)) {
         nextToken();
     } 
     return ls;
@@ -67,9 +73,12 @@ LetStatement* Parser::parseLetStatement() {
 
 
 ReturnStatement* Parser::parseReturnStatement() { 
-    auto rs = new ReturnStatement(cur_token_);
-    // FixMe parse expression
-    while(!currentTokenIs(TokenType::SEMICOLON)) {
+    auto t = cur_token_;
+    nextToken();
+    auto v = parseExpression(Priority::LOWEST);
+
+    auto rs = new ReturnStatement(t, v);
+    if(peekTokenIs(TokenType::SEMICOLON)) {
         nextToken();
     } 
 
@@ -78,7 +87,7 @@ ReturnStatement* Parser::parseReturnStatement() {
 
 ExpressionStatement* Parser::parseExpressionStatement() {
     auto es = new ExpressionStatement(cur_token_);
-    es->setExpression(parseExpression(Priority::LOWEST));
+    es->setExpression(parseExpression(Priority::LOWEST)); 
 
     if(peekTokenIs(TokenType::SEMICOLON)) {
         nextToken();
