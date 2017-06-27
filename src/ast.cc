@@ -57,9 +57,8 @@ Object* IntegerLiteral::eval() {
     return int_val;
 }
 
-Object* Boolean::eval() {
-    return nullptr;
-
+Object* Boolean::eval() { 
+    return new BooleanObj(value_);
 } 
 
 Object* BlockStatement::eval() {

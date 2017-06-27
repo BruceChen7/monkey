@@ -31,6 +31,7 @@ struct BooleanObj: public Object {
         ss << val;
         return ss.str();
     } 
+    BooleanObj(bool v):val(v) { }
     
     string type() override { 
         return "BOOLEAN";
