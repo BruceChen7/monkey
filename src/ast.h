@@ -1,8 +1,7 @@
 #ifndef __AST_H__
 #define __AST_H__
 #include "lex.h"
-#include "obj.h"
-
+#include "obj.h" 
 
 #include <string>
 #include <vector>
@@ -177,8 +176,7 @@ class PrefixExpression: public Expression {
         }
         Expression* getExpression() const {
             return expr_.get();
-        }
-        
+        } 
     private:
         Token token_;
         string operator_;

@@ -1,7 +1,6 @@
 #include "parser.h"
 #include "lex.h"
-#include "ast.h"
-
+#include "ast.h" 
 
 
 const unordered_map<TokenType, Priority, EnumClassHash> Parser::sPriority = {

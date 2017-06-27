@@ -37,16 +37,23 @@ static bool testBooleanObject(Object* o, bool t) {
 
 }
 
+static bool testInfixExpresion(Object* o, int val) {
+    
+}
+
 int main() {
     auto val = unique_ptr<Object>(eval("5")); 
     testIntegerObject(val.get(), 5); 
+    val.reset(eval("10"));
+    testIntegerObject(val.get(), 10);
 
+    // bool test
     auto b = unique_ptr<Object>(eval("true"));
     testBooleanObject(b.get(), true);
     b.reset(eval("false"));
     testBooleanObject(b.get(), false);
-    return 0;
 
+    return 0; 
 }
 
 

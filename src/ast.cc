@@ -1,4 +1,5 @@
 #include "ast.h"
+#include "eval.h"
 
 string LetStatement::toString() {
     stringstream ss; 
@@ -41,11 +42,14 @@ Object* ExpressionStatement::eval() {
 
 
 Object* PrefixExpression::eval() {
-    return nullptr;
+    auto right = expr_->eval();
+    return const_cast<Object*>(evalPrefixExpression(operator_, right));
 }
 
 Object* InfixExpression::eval() {
-    return nullptr;
+    Object* left_val = left_->eval();
+    Object* right_val = right_->eval();
+    return const_cast<Object*>(evalInprefixExpression(left_val, right_val, op_));
 }
 
 Object* IdentifierNode::eval() {
