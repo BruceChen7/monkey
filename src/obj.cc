@@ -18,6 +18,26 @@ Object* IntegerObject::binaryOperation(const string& op,  IntegerObject* right) 
         // Fix Me: divide 0
         return new IntegerObject(val / right->val);
     }
+
+    if(op == ">") { 
+        return new BooleanObj( val > right->val );
+    }
+
+    if(op == "<") {
+        return new BooleanObj( val < right->val);
+    }
+
+    if(op == ">=") {
+        return new BooleanObj(val >= right->val);
+    }
+
+    if(op == "==") {
+        return new BooleanObj(val == right->val);
+    }
+
+    if(op == "<=") {
+        return new BooleanObj(val == right->val);
+    }
     return new NullObj{};
 }
 

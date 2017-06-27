@@ -96,7 +96,7 @@ ExpressionStatement* Parser::parseExpressionStatement() {
 
 void Parser::noPrefixParserFnError(TokenType t) { 
     stringstream ss;
-    ss << "no prefix parse function for " << convertTokenType(t) << "found" << endl;
+    ss << "no prefix parse function for " << convertTokenType(t) << " found" << endl;
     errors_.push_back(ss.str());
 }
 
