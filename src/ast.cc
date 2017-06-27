@@ -19,3 +19,62 @@ string LetStatement::getName() {
 string LetStatement::getValue() {
     return value_->toString();
 }
+
+Object* Program::eval() {
+    Object* res;
+    for(const auto& s : statements_) {
+        res = s->eval(); 
+    }
+    return res;
+}
+Object* LetStatement::eval() {
+    return nullptr;
+}
+
+Object* ReturnStatement::eval() {
+    return nullptr;
+}
+
+Object* ExpressionStatement::eval() {
+    return expr_->eval();
+}
+
+
+Object* PrefixExpression::eval() {
+    return nullptr;
+}
+
+Object* InfixExpression::eval() {
+    return nullptr;
+}
+
+Object* IdentifierNode::eval() {
+    return nullptr;
+}
+
+Object* IntegerLiteral::eval() {
+    Object* int_val = new IntegerObject(value_);
+    return int_val;
+}
+
+Object* Boolean::eval() {
+    return nullptr;
+
+} 
+
+Object* BlockStatement::eval() {
+    return nullptr;
+}
+
+Object* IfExpression::eval() {
+    return nullptr;
+
+}
+
+Object* FunctionLiteral::eval() { 
+    return nullptr;
+}
+
+Object* CallExpression::eval() { 
+    return nullptr;
+} 

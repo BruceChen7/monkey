@@ -13,6 +13,7 @@ test:
 	@mkdir -p bin
 	$(CC) -o bin/test_lexer  $(FLAGS) tests/test_lexer.cc $(SRC)
 	$(CC) -o bin/test_parser $(FLAGS) tests/test_parser.cc $(SRC)
+	$(CC) -o bin/test_eval $(FLAGS) tests/test_eval.cc $(SRC)
 
 clean:
 	@rm -rf bin/
