@@ -51,6 +51,15 @@ static bool testIfElseStatement() {
             
 }
 
+static bool testReturnValue() {
+    auto return_test = unique_ptr<Object>(eval("1; return 2;")); 
+    assert(return_test->inspect() == "2");
+    return_test.reset(eval("return 1; 2"));
+    assert(return_test->inspect() == "1");
+    return_test.reset(eval("return 2 * 5 * 10; 2"));
+    assert(return_test->inspect() == "100"); 
+}
+
 int main() {
     auto val = unique_ptr<Object>(eval("5")); 
     testIntegerObject(val.get(), 5); 

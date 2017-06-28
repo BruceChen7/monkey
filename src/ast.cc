@@ -25,6 +25,11 @@ Object* Program::eval() {
     Object* res;
     for(const auto& s : statements_) {
         res = s->eval(); 
+        ReturnValue* rv = dynamic_cast<ReturnValue*>(res);
+        
+        if(rv != nullptr) {
+            return res;
+        }
     }
     return res;
 }
@@ -32,8 +37,9 @@ Object* LetStatement::eval() {
     return nullptr;
 }
 
-Object* ReturnStatement::eval() {
-    return nullptr;
+Object* ReturnStatement::eval() { 
+    auto res = new ReturnValue(expression_->eval());
+    return res;
 }
 
 Object* ExpressionStatement::eval() {
@@ -69,6 +75,12 @@ Object* BlockStatement::eval() {
     Object* res;
     for(const auto& s : statements_) { 
         res = s->eval();
+
+        ReturnValue* rv = dynamic_cast<ReturnValue*>(res);
+        
+        if(rv != nullptr) {
+            return res;
+        }
     }
     return res;
 

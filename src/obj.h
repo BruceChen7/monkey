@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <sstream>
+#include <memory>
 
 using namespace std;
 
@@ -74,4 +75,19 @@ struct NullObj: public Object {
     }
 };
 
+struct ReturnValue: public Object { 
+    string inspect() override { 
+        return val->inspect();
+    }
+    ReturnValue(Object* o) {
+        val.reset(o);
+    }
+    string type() {
+        return "RETURN_VALUE";
+    }
+
+    ReturnValue(const ReturnValue& ) = delete;
+    ReturnValue& operator=(const ReturnValue&) = delete;
+    unique_ptr<Object> val;
+};
 #endif
