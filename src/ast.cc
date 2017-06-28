@@ -66,12 +66,24 @@ Object* Boolean::eval() {
 } 
 
 Object* BlockStatement::eval() {
-    return nullptr;
+    Object* res;
+    for(const auto& s : statements_) { 
+        res = s->eval();
+    }
+    return res;
+
 }
 
-Object* IfExpression::eval() {
-    return nullptr;
+Object* IfExpression::eval() { 
+    Object* cond = cond_->eval();
 
+    if(cond->isTrue()) {
+        return consequence_->eval();
+    } else if (alternative_ != nullptr ) {
+        return alternative_->eval();
+    } else {
+        return new NullObj();
+    }
 }
 
 Object* FunctionLiteral::eval() { 

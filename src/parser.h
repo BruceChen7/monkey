@@ -58,6 +58,8 @@ class Parser {
             registerInfixFn(TokenType::LESS, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
             registerInfixFn(TokenType::GREAT, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
             registerInfixFn(TokenType::LPAREN, std::bind(&Parser::parseCallExpression, this, placeholders::_1));
+            registerInfixFn(TokenType::GREATEQUAL, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
+            registerInfixFn(TokenType::LESSEQUAL, std::bind(&Parser::parseInprefixExpression, this, placeholders::_1));
         }
 
         Token nextToken() { 

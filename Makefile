@@ -1,12 +1,16 @@
 CC := g++
 FLAGS := -g -I  src -std=c++11
 
+MAIN_SRC := src/main.cc
 SRC := $(wildcard src/*.cc)
+SRC := $(filter-out $(MAIN_SRC), $(SRC))
+
 
 .PHONY:all test clean
 
 all: 
-	$(CC) -o bin/monkey $(FLAGS) $(SRC) 
+	@echo $(SRC)
+	$(CC) -o bin/monkey $(FLAGS) $(MAIN_SRC) $(SRC) 
 
 test:
 	@echo "tests for monkey"

@@ -69,8 +69,7 @@ struct TestIfExpression {
 
 vector<TestIfExpression> testIfExpression {
     {"if(x < y)  { x }", "if", "(x < y)", "x", ""},
-    {"if(x < y)  { x } else { y }", "if", "(x < y)", "x", "y"},
-
+    {"if(x < y)  { x } else { y }", "if", "(x < y)", "x", "y"}, 
 };
 
 

@@ -10,7 +10,9 @@ using namespace std;
 struct Object {
     virtual string inspect() = 0; 
     virtual string type() = 0;
-    virtual bool isTrue() = 0;
+    virtual bool isTrue()  {
+        return true;
+    }
 };
 
 struct IntegerObject: public Object {

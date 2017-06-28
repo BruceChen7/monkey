@@ -41,6 +41,16 @@ static bool testInfixExpresion(Object* o, int val) {
     
 }
 
+static bool testIfElseStatement() {
+    auto if_test = unique_ptr<Object>(eval("if ( 2 * 5 > 2) { 2 } ")); 
+    assert(if_test->inspect() == "2");
+    if_test.reset(eval("if (!true) { 1 }  else { 3 }"));
+    assert(if_test->inspect() == "3");
+    if_test.reset(eval("if (!true) { 1 }"));
+    assert(if_test->inspect() == "null");
+            
+}
+
 int main() {
     auto val = unique_ptr<Object>(eval("5")); 
     testIntegerObject(val.get(), 5); 
@@ -51,8 +61,8 @@ int main() {
     auto b = unique_ptr<Object>(eval("true"));
     testBooleanObject(b.get(), true);
     b.reset(eval("false"));
-    testBooleanObject(b.get(), false);
-
+    testBooleanObject(b.get(), false); 
+    testIfElseStatement();
     return 0; 
 }
 
