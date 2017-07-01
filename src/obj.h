@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <sstream>
 #include <memory>
+#include <iostream>
 
 using namespace std;
 
@@ -14,6 +15,7 @@ struct Object {
     virtual bool isTrue()  {
         return true;
     }
+    virtual ~Object() {}
 };
 
 struct IntegerObject: public Object {
@@ -80,11 +82,13 @@ struct ReturnValue: public Object {
         return val->inspect();
     }
     ReturnValue(Object* o) {
+        cout << "set " << endl;
         val.reset(o);
     }
     string type() override {
         return "RETURN_VALUE";
     }
+    ~ReturnValue() = default;
 
     ReturnValue(const ReturnValue& ) = delete;
     ReturnValue& operator=(const ReturnValue&) = delete;

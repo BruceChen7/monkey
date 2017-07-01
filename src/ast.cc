@@ -1,5 +1,7 @@
 #include "ast.h"
 #include "eval.h"
+#include <iostream>
+using namespace std;
 
 string LetStatement::toString() {
     stringstream ss; 
@@ -22,10 +24,19 @@ string LetStatement::getValue() {
 }
 
 Object* Program::eval() {
-    Object* res;
+    Object* res = nullptr;
+    Object* previous_res = nullptr;
     for(const auto& s : statements_) {
+        previous_res = res;
         res = s->eval(); 
+
+        if(previous_res) {
+            cout << "delete previous res " << endl;
+            delete previous_res;
+        }
+
         ReturnValue* rv = dynamic_cast<ReturnValue*>(res); 
+
         if(rv != nullptr) {
             return res;
         }
@@ -33,8 +44,7 @@ Object* Program::eval() {
         Error* ev = dynamic_cast<Error*>(res);
         if(ev != nullptr) {
             return res;
-        }
-
+        } 
     }
     return res;
 }
@@ -56,29 +66,32 @@ Object* ExpressionStatement::eval() {
 
 
 Object* PrefixExpression::eval() {
-    auto right = expr_->eval();
-    if(isError(right)) { 
-        return right;
+    auto right = unique_ptr<Object>(expr_->eval());
+
+    if(isError(right.get())) { 
+        return expr_->eval();
     } 
-    return const_cast<Object*>(evalPrefixExpression(operator_, right));
+    return const_cast<Object*>(evalPrefixExpression(operator_, right.get()));
 }
 
 Object* InfixExpression::eval() {
-    Object* left_val = left_->eval();
-    Object* right_val = right_->eval();
+    auto left_val = unique_ptr<Object>(left_->eval());
+    auto right_val = unique_ptr<Object>(right_->eval());
 
-    if(isError(left_val)) {
-        return left_val;
+    if(isError(left_val.get())) { 
+        return left_->eval();
     }
 
-    if(isError(right_val)) {
-        return right_val;
+    if(isError(right_val.get())) {
+        return right_->eval();
     }
 
     if(left_val->type() != right_val->type()) { 
         return new Error({"type mismatch: ", left_val->type(), " ", op_, " ", right_val->type()});
+    } else { 
+        return const_cast<Object*>(evalInprefixExpression(left_val.get(), right_val.get(), op_));
+
     }
-    return const_cast<Object*>(evalInprefixExpression(left_val, right_val, op_));
 }
 
 Object* IdentifierNode::eval() {
@@ -115,9 +128,9 @@ Object* BlockStatement::eval() {
 }
 
 Object* IfExpression::eval() { 
-    Object* cond = cond_->eval();
-    if(isError(cond)) {
-        return cond;
+    unique_ptr<Object> cond(cond_->eval());
+    if(isError(cond.get())) {
+        return cond_->eval();
     }
 
     if(cond->isTrue()) {
