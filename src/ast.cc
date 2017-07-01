@@ -25,11 +25,16 @@ Object* Program::eval() {
     Object* res;
     for(const auto& s : statements_) {
         res = s->eval(); 
-        ReturnValue* rv = dynamic_cast<ReturnValue*>(res);
-        
+        ReturnValue* rv = dynamic_cast<ReturnValue*>(res); 
         if(rv != nullptr) {
             return res;
         }
+        
+        Error* ev = dynamic_cast<Error*>(res);
+        if(ev != nullptr) {
+            return res;
+        }
+
     }
     return res;
 }
@@ -38,8 +43,11 @@ Object* LetStatement::eval() {
 }
 
 Object* ReturnStatement::eval() { 
-    auto res = new ReturnValue(expression_->eval());
-    return res;
+    auto val = expression_->eval();
+    if(isError(val)) {
+        return val;
+    }
+    return  new ReturnValue(val);
 }
 
 Object* ExpressionStatement::eval() {
@@ -49,12 +57,27 @@ Object* ExpressionStatement::eval() {
 
 Object* PrefixExpression::eval() {
     auto right = expr_->eval();
+    if(isError(right)) { 
+        return right;
+    } 
     return const_cast<Object*>(evalPrefixExpression(operator_, right));
 }
 
 Object* InfixExpression::eval() {
     Object* left_val = left_->eval();
     Object* right_val = right_->eval();
+
+    if(isError(left_val)) {
+        return left_val;
+    }
+
+    if(isError(right_val)) {
+        return right_val;
+    }
+
+    if(left_val->type() != right_val->type()) { 
+        return new Error({"type mismatch: ", left_val->type(), " ", op_, " ", right_val->type()});
+    }
     return const_cast<Object*>(evalInprefixExpression(left_val, right_val, op_));
 }
 
@@ -80,7 +103,12 @@ Object* BlockStatement::eval() {
         
         if(rv != nullptr) {
             return res;
+        } 
+
+        if(res->type() == "ERROR") {
+            return res;
         }
+
     }
     return res;
 
@@ -88,6 +116,9 @@ Object* BlockStatement::eval() {
 
 Object* IfExpression::eval() { 
     Object* cond = cond_->eval();
+    if(isError(cond)) {
+        return cond;
+    }
 
     if(cond->isTrue()) {
         return consequence_->eval();

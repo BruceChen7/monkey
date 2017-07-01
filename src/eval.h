@@ -6,6 +6,7 @@ const Object* evalPrefixExpression(const string& op, Object* right);
 const Object* evalBangOperatorExpression(Object* right);
 const Object* evalMinusPrefixExpression(Object* right);
 const Object* evalInprefixExpression(Object* left, Object* right, const string& op);
+bool isError(Object* o);
 
 
 #endif

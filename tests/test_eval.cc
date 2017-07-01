@@ -60,6 +60,26 @@ static bool testReturnValue() {
     assert(return_test->inspect() == "100"); 
 }
 
+static bool testErrorHandling() {
+    auto error_test = unique_ptr<Object>(eval("5 + true")); 
+
+    assert(error_test->inspect() == "type mismatch: INTEGER + BOOLEAN");
+    error_test.reset(eval("5 + true; 5;"));
+    assert(error_test->inspect() == "type mismatch: INTEGER + BOOLEAN");
+    
+    error_test.reset(eval("-true"));
+    assert(error_test->inspect() == "unknown operator: -BOOLEAN"); 
+
+    error_test.reset(eval("true + false;"));
+    assert(error_test->inspect() == "unknown operator: BOOLEAN + BOOLEAN"); 
+
+    error_test.reset(eval("5; true + false; 5"));
+    assert(error_test->inspect() == "unknown operator: BOOLEAN + BOOLEAN"); 
+
+    error_test.reset(eval("if ( 10 > 1) {true + false; }"));
+    assert(error_test->inspect() == "unknown operator: BOOLEAN + BOOLEAN"); 
+}
+
 int main() {
     auto val = unique_ptr<Object>(eval("5")); 
     testIntegerObject(val.get(), 5); 
@@ -72,6 +92,8 @@ int main() {
     b.reset(eval("false"));
     testBooleanObject(b.get(), false); 
     testIfElseStatement();
+    testReturnValue();
+    testErrorHandling();
     return 0; 
 }
 

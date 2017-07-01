@@ -82,12 +82,34 @@ struct ReturnValue: public Object {
     ReturnValue(Object* o) {
         val.reset(o);
     }
-    string type() {
+    string type() override {
         return "RETURN_VALUE";
     }
 
     ReturnValue(const ReturnValue& ) = delete;
     ReturnValue& operator=(const ReturnValue&) = delete;
     unique_ptr<Object> val;
+};
+
+struct Error: public Object { 
+
+    string type() override {
+        return "ERROR";
+    }
+
+    string inspect() override {
+        return msg;
+    }
+    bool isTrue() override {
+        return false;
+    }
+    Error(const std::initializer_list<string> para) {
+        stringstream ss; 
+        for(const auto& p : para) {
+            ss << p;
+        }
+        msg = ss.str();
+    }
+    string msg; 
 };
 #endif

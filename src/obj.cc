@@ -37,8 +37,8 @@ Object* IntegerObject::binaryOperation(const string& op,  IntegerObject* right) 
 
     if(op == "<=") {
         return new BooleanObj(val == right->val);
-    }
-    return new NullObj{};
-}
+    } 
+    return new Error({"unknown operator: ",  type(), " ", op, " ", right->type()});
+};
 
 
