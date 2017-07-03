@@ -16,7 +16,8 @@ static void printErros(const vector<string>& e) {
 
 int main() { 
     string s;
-
+    // FixMe momory leak;
+    auto env = unique_ptr<Env>(new Env());
     while (true) {
         cout << sPrompt;
         getline(cin, s);
@@ -25,8 +26,8 @@ int main() {
 
         if(!p->getErrors().empty()) { 
             printErros(p->getErrors());
-        } else {
-            auto val = unique_ptr<Object>(program->eval());
+        } else { 
+            auto val = program->eval(env.get());
             cout << val->inspect() << "\n";
         }
     } 

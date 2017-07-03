@@ -1,5 +1,6 @@
 #include "ast.h"
 #include "eval.h"
+#include "env.h"
 #include <iostream>
 using namespace std;
 
@@ -23,96 +24,98 @@ string LetStatement::getValue() {
     return value_->toString();
 }
 
-Object* Program::eval() {
-    Object* res = nullptr;
-    Object* previous_res = nullptr;
+shared_ptr<Object> Program::eval(Env* env) {
+    shared_ptr<Object> res;
     for(const auto& s : statements_) {
-        previous_res = res;
-        res = s->eval(); 
-
-        if(previous_res) {
-            cout << "delete previous res " << endl;
-            delete previous_res;
-        }
-
-        ReturnValue* rv = dynamic_cast<ReturnValue*>(res); 
+        res = s->eval(env); 
+        ReturnValue* rv = dynamic_cast<ReturnValue*>(res.get()); 
 
         if(rv != nullptr) {
             return res;
         }
         
-        Error* ev = dynamic_cast<Error*>(res);
+        Error* ev = dynamic_cast<Error*>(res.get());
         if(ev != nullptr) {
             return res;
         } 
     }
     return res;
 }
-Object* LetStatement::eval() {
-    return nullptr;
-}
-
-Object* ReturnStatement::eval() { 
-    auto val = expression_->eval();
-    if(isError(val)) {
+shared_ptr<Object> LetStatement::eval(Env* env) { 
+    auto val = value_->eval(env);
+    if(isError(val.get())) {
         return val;
     }
-    return  new ReturnValue(val);
+    env->set(name_->getValue(), val);
+    return val;
 }
 
-Object* ExpressionStatement::eval() {
-    return expr_->eval();
+shared_ptr<Object> ReturnStatement::eval(Env* env) { 
+    auto val = expression_->eval(env);
+    if(isError(val.get())) {
+        return val;
+    }
+    return  make_shared<ReturnValue>(val);
+}
+
+shared_ptr<Object> ExpressionStatement::eval(Env* env) {
+    return expr_->eval(env);
 }
 
 
-Object* PrefixExpression::eval() {
-    auto right = unique_ptr<Object>(expr_->eval());
+shared_ptr<Object> PrefixExpression::eval(Env* env) {
+    auto right = expr_->eval(env);
 
     if(isError(right.get())) { 
-        return expr_->eval();
+        return expr_->eval(env);
     } 
-    return const_cast<Object*>(evalPrefixExpression(operator_, right.get()));
+    return shared_ptr<Object>(const_cast<Object*>(evalPrefixExpression(operator_, right.get())));
 }
 
-Object* InfixExpression::eval() {
-    auto left_val = unique_ptr<Object>(left_->eval());
-    auto right_val = unique_ptr<Object>(right_->eval());
+shared_ptr<Object> InfixExpression::eval(Env* env) {
+    auto left_val = left_->eval(env);
+    auto right_val = right_->eval(env);
 
     if(isError(left_val.get())) { 
-        return left_->eval();
+        return left_->eval(env);
     }
 
     if(isError(right_val.get())) {
-        return right_->eval();
+        return right_->eval(env);
     }
 
     if(left_val->type() != right_val->type()) { 
-        return new Error({"type mismatch: ", left_val->type(), " ", op_, " ", right_val->type()});
+        return shared_ptr<Error>(new Error{"type mismatch: ", left_val->type(), " ", op_, " ", right_val->type()});
     } else { 
-        return const_cast<Object*>(evalInprefixExpression(left_val.get(), right_val.get(), op_));
+        return shared_ptr<Object>(const_cast<Object*>(evalInprefixExpression(left_val.get(), right_val.get(), op_)));
 
     }
 }
 
-Object* IdentifierNode::eval() {
-    return nullptr;
+shared_ptr<Object> IdentifierNode::eval(Env* env) {
+    auto val_pair = env->get(value_);
+
+    if(val_pair.first != true) {
+        return shared_ptr<Error>(new Error{"identifer not found: ", value_});
+    }
+    return val_pair.second;
 }
 
-Object* IntegerLiteral::eval() {
-    Object* int_val = new IntegerObject(value_);
+shared_ptr<Object> IntegerLiteral::eval(Env* env) {
+    auto int_val = make_shared<IntegerObject>(value_);
     return int_val;
 }
 
-Object* Boolean::eval() { 
-    return new BooleanObj(value_);
+shared_ptr<Object> Boolean::eval(Env* env) { 
+    return make_shared<BooleanObj>(value_);
 } 
 
-Object* BlockStatement::eval() {
-    Object* res;
+shared_ptr<Object> BlockStatement::eval(Env* env) {
+    shared_ptr<Object> res;
     for(const auto& s : statements_) { 
-        res = s->eval();
+        res = s->eval(env);
 
-        ReturnValue* rv = dynamic_cast<ReturnValue*>(res);
+        ReturnValue* rv = dynamic_cast<ReturnValue*>(res.get());
         
         if(rv != nullptr) {
             return res;
@@ -127,25 +130,25 @@ Object* BlockStatement::eval() {
 
 }
 
-Object* IfExpression::eval() { 
-    unique_ptr<Object> cond(cond_->eval());
+shared_ptr<Object> IfExpression::eval(Env* env) { 
+    shared_ptr<Object> cond = cond_->eval(env);
     if(isError(cond.get())) {
-        return cond_->eval();
+        return cond_->eval(env);
     }
 
     if(cond->isTrue()) {
-        return consequence_->eval();
+        return consequence_->eval(env);
     } else if (alternative_ != nullptr ) {
-        return alternative_->eval();
+        return alternative_->eval(env);
     } else {
-        return new NullObj();
+        return shared_ptr<NullObj>(new NullObj());
     }
 }
 
-Object* FunctionLiteral::eval() { 
+shared_ptr<Object> FunctionLiteral::eval(Env* env) { 
     return nullptr;
 }
 
-Object* CallExpression::eval() { 
+shared_ptr<Object> CallExpression::eval(Env* env) { 
     return nullptr;
 } 

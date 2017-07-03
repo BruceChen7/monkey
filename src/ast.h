@@ -2,6 +2,7 @@
 #define __AST_H__
 #include "lex.h"
 #include "obj.h" 
+#include "env.h"
 
 #include <string>
 #include <vector>
@@ -18,7 +19,7 @@ class ASTNode {
         virtual string tokenLiteral() = 0;
         virtual string toString() = 0;
         virtual ~ASTNode() {};
-        virtual Object* eval() = 0;
+        virtual shared_ptr<Object> eval(Env* env) = 0;
 };
 
 class Statement : public ASTNode {
@@ -26,7 +27,7 @@ class Statement : public ASTNode {
         virtual  void statementNode() = 0;
         virtual string toString() = 0;
         virtual ~Statement() = default;
-        virtual Object* eval() = 0;
+        virtual shared_ptr<Object> eval(Env* env) = 0;
 };
 
 class Expression: public ASTNode {
@@ -59,7 +60,7 @@ class Program : public ASTNode {
             return &statements_;
         }
 
-        virtual Object* eval();
+        virtual shared_ptr<Object> eval(Env* env);
 
     public:
         virtual ~Program() = default;
@@ -80,7 +81,7 @@ class LetStatement: public Statement {
         void setExpression(Expression* e)  { 
             value_.reset(e);
         }
-        virtual Object* eval();
+        virtual shared_ptr<Object> eval(Env* env);
 
     public: 
         virtual  void statementNode() override {}
@@ -112,7 +113,7 @@ class ReturnStatement: public Statement {
             ss << "; ";
             return ss.str();
         }
-        virtual Object* eval();
+        virtual shared_ptr<Object> eval(Env* env);
 
     public:
         ReturnStatement(Token t, Expression* val): token_(t) { 
@@ -140,7 +141,7 @@ class ExpressionStatement: public Statement {
             }
             return "";
         }
-        virtual Object* eval();
+        virtual shared_ptr<Object> eval(Env* env);
     public:
         ExpressionStatement(const Token& t):token_(t) {
         } 
@@ -166,7 +167,7 @@ class PrefixExpression: public Expression {
             ss << "(" << operator_ << expr_->toString() << ")" ;
             return ss.str(); 
         }
-        virtual Object* eval();
+        virtual shared_ptr<Object> eval(Env* env);
     public:
         PrefixExpression(const Token& t, string op, Expression* e):token_(t), operator_(op) {
             expr_.reset(e); 
@@ -196,7 +197,7 @@ class InfixExpression: public Expression {
             ss << op_ << " "<< right_->toString() << ")" ; 
             return ss.str(); 
         }
-        virtual Object* eval();
+        virtual shared_ptr<Object> eval(Env* env);
     public: 
         InfixExpression(const Token& t, const string& op, Expression* l, Expression* r):token_(t),op_(op) {
             left_.reset(l);
@@ -219,7 +220,11 @@ class IdentifierNode : public Expression {
         virtual string toString()  override { 
             return value_;
         }
-        virtual Object* eval();
+        virtual shared_ptr<Object> eval(Env* env);
+
+        string getValue() const { 
+            return value_;
+        }
 
     public:
         IdentifierNode(Token t, string v = ""): token_(t), value_(v) { 
@@ -243,7 +248,7 @@ class IntegerLiteral: public Expression {
         int64_t getValue() const {
             return value_;
         }
-        virtual Object* eval();
+        virtual shared_ptr<Object> eval(Env* env);
     public:
         IntegerLiteral(const Token& t, long long int v): token_(t), value_(v) { }
     private:
@@ -264,7 +269,7 @@ class Boolean: public Expression {
             return value_; 
         }
 
-        virtual Object* eval();
+        virtual shared_ptr<Object> eval(Env* env);
 
         Boolean(const Token& t, bool v): token_(t), value_(v) { }
 
@@ -287,7 +292,7 @@ class BlockStatement: public Statement {
             return ss.str();
         } 
         virtual void statementNode() override { }
-        virtual Object* eval();
+        virtual shared_ptr<Object> eval(Env* env);
         
     public:
         BlockStatement(const Token& t): token_(t) { }
@@ -315,7 +320,7 @@ class IfExpression: public Expression {
             } 
             return ss.str(); 
         } 
-        virtual Object* eval();
+        virtual shared_ptr<Object> eval(Env* env);
     public:
         IfExpression(const Token& t, Expression* c, BlockStatement* cons, BlockStatement* alter = nullptr): token_(t) {
             cond_.reset(c);
@@ -371,7 +376,7 @@ class FunctionLiteral: public Expression {
             ss << body_->toString();
         } 
 
-        virtual Object* eval();
+        virtual shared_ptr<Object> eval(Env* env);
     public:
         FunctionLiteral(const Token& t, const vector<IdentifierNode*>& param, BlockStatement* body):token_(t) {
             body_.reset(body);
@@ -410,7 +415,7 @@ class CallExpression: public Expression {
             ss << ")"; 
             return ss.str();
         } 
-        virtual Object* eval();
+        virtual shared_ptr<Object> eval(Env* env);
     public:
         CallExpression(const CallExpression& o) = delete;
         CallExpression& operator=(const CallExpression&) = delete;

@@ -81,9 +81,8 @@ struct ReturnValue: public Object {
     string inspect() override { 
         return val->inspect();
     }
-    ReturnValue(Object* o) {
-        cout << "set " << endl;
-        val.reset(o);
+    ReturnValue(shared_ptr<Object> o) { 
+        val = o;
     }
     string type() override {
         return "RETURN_VALUE";
@@ -92,7 +91,7 @@ struct ReturnValue: public Object {
 
     ReturnValue(const ReturnValue& ) = delete;
     ReturnValue& operator=(const ReturnValue&) = delete;
-    unique_ptr<Object> val;
+    shared_ptr<Object> val;
 };
 
 struct Error: public Object { 
