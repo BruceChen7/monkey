@@ -1,4 +1,5 @@
 #include "obj.h" 
+#include "ast.h"
 
 Object* IntegerObject::binaryOperation(const string& op,  IntegerObject* right) { 
     if(op == "+") {
@@ -42,3 +43,20 @@ Object* IntegerObject::binaryOperation(const string& op,  IntegerObject* right) 
 };
 
 
+
+string FunctionObj::inspect() { 
+    stringstream ss;
+    ss << "fn(";
+    for(auto i = 0; i < params.size(); i++) {
+        ss << params[i]->toString();
+
+        if(i != params.size() - 1) {
+            ss << params[i] << " , ";
+        }
+    }
+
+    ss << ") {\n";
+    ss << body->toString();
+    ss << "\n}"; 
+    return ss.str();
+}

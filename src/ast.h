@@ -381,18 +381,18 @@ class FunctionLiteral: public Expression {
         FunctionLiteral(const Token& t, const vector<IdentifierNode*>& param, BlockStatement* body):token_(t) {
             body_.reset(body);
             std::transform(param.begin(), param.end(), std::back_inserter(para_), [](IdentifierNode* i) { 
-                    return std::move(unique_ptr<IdentifierNode>(i));
+                    return shared_ptr<IdentifierNode>(i);
             });
         } 
         FunctionLiteral(const FunctionLiteral&) = delete;
         FunctionLiteral&operator=(const FunctionLiteral&) = delete;
-        const vector<unique_ptr<IdentifierNode>>& getParam() {
+        const vector<shared_ptr<IdentifierNode>>& getParam() {
             return para_;
         }
     private:
-        vector<unique_ptr<IdentifierNode>> para_;
+        vector<shared_ptr<IdentifierNode>> para_;
         Token token_;
-        unique_ptr<BlockStatement> body_;
+        shared_ptr<BlockStatement> body_;
 };
 
 class CallExpression: public Expression {

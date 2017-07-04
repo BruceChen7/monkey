@@ -146,9 +146,12 @@ shared_ptr<Object> IfExpression::eval(Env* env) {
 }
 
 shared_ptr<Object> FunctionLiteral::eval(Env* env) { 
-    return nullptr;
+    return shared_ptr<FunctionObj>(new FunctionObj(para_, body_, env));
 }
 
 shared_ptr<Object> CallExpression::eval(Env* env) { 
-    return nullptr;
+    auto func = function_->eval(env);
+    if(isError(func.get())) {
+        return func; 
+    } 
 } 

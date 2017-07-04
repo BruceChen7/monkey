@@ -5,8 +5,12 @@
 #include <unordered_map>
 #include <sstream>
 #include <memory>
-#include <iostream>
+#include <vector>
 
+
+class  IdentifierNode;
+class BlockStatement;
+class Env;
 using namespace std;
 
 struct Object {
@@ -114,5 +118,20 @@ struct Error: public Object {
         msg = ss.str();
     }
     string msg; 
+};
+
+struct FunctionObj: public Object {
+    vector<shared_ptr<IdentifierNode>> params;
+    shared_ptr<BlockStatement> body; 
+    Env* env;
+    FunctionObj(const vector<shared_ptr<IdentifierNode>>& p, const shared_ptr<BlockStatement>& b, Env* e):
+        params(p), body(b), env(e) {  }
+    string type() override {
+        return "FUNCTION";
+    }
+    string inspect();
+    bool isTrue()override {
+        return false; 
+    }
 };
 #endif

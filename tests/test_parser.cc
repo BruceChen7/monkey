@@ -237,7 +237,7 @@ static void testFuncParamParsing() {
        assert(func_expr_statement != nullptr);
        FunctionLiteral* func = dynamic_cast<FunctionLiteral*>(func_expr_statement->getExpression()); 
        assert(func != nullptr);
-       const vector<unique_ptr<IdentifierNode>>& param = func->getParam(); 
+       const auto& param = func->getParam(); 
 
        vector<string> param_str{};
        for(auto i = 0; i < param.size(); i++) { 

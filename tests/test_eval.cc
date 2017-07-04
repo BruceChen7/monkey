@@ -82,6 +82,24 @@ static bool testEvalLetstatement() {
     auto error_test = eval("let a = 1; let b = a;");
 }
 
+
+static void testFunctionObj() {
+    auto func = eval("fn(x){ x + 2; };");
+    auto pfunc = dynamic_cast<FunctionObj*>(func.get());
+    assert(pfunc != nullptr);
+    assert((pfunc->params).size() == 1); 
+    assert(pfunc->body->toString() == "(x + 2)");
+    assert((pfunc->params[0]->toString() == "x"));
+}
+
+static void testFuncApplication() {
+    auto fn = eval("let identity = fn(x) {x;} identity(5);");
+    testIntegerObject(fn.get(), 5);
+    fn = eval("let identity = fn(x) { return x; }; identity(5)");
+    testIntegerObject(fn.get(), 5);
+}
+
+
 int main() {
     auto val = eval("5"); 
     testIntegerObject(val.get(), 5); 
@@ -99,6 +117,8 @@ int main() {
     testReturnValue();
     testErrorHandling();
     testEvalLetstatement();
+    testFunctionObj();
+    // testFuncApplication();
     return 0; 
 }
 
