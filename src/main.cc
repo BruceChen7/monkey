@@ -9,6 +9,7 @@ using namespace std;
 
 const static string sPrompt = ">>> ";
 static void printErros(const vector<string>& e) {
+    cout << "something error" << endl;
     std::for_each(e.begin(), e.end(), [](const string& s) { 
             cout << s;
     });
@@ -16,8 +17,7 @@ static void printErros(const vector<string>& e) {
 
 int main() { 
     string s;
-    // FixMe momory leak;
-    auto env = unique_ptr<Env>(new Env());
+    auto env = shared_ptr<Env>(new Env());
     while (true) {
         cout << sPrompt;
         getline(cin, s);
@@ -28,7 +28,9 @@ int main() {
             printErros(p->getErrors());
         } else { 
             auto val = program->eval(env.get());
-            cout << val->inspect() << "\n";
+            if(val->type() == "INTEGER" || val->type() == "BOOLEAN") { 
+                cout << val->inspect() << "\n";
+            }
         }
     } 
     return 0;

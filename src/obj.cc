@@ -51,8 +51,9 @@ string FunctionObj::inspect() {
         ss << params[i]->toString();
 
         if(i != params.size() - 1) {
-            ss << params[i] << " , ";
+            ss << ", ";
         }
+
     }
 
     ss << ") {\n";

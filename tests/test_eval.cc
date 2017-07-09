@@ -118,7 +118,7 @@ int main() {
     testErrorHandling();
     testEvalLetstatement();
     testFunctionObj();
-    // testFuncApplication();
+    testFuncApplication();
     return 0; 
 }
 

@@ -18,11 +18,21 @@ class Env {
             if(it != env_.end()) {
                 return make_pair(true, it->second);
             } else {
-                return make_pair(false, nullptr);
+                if(outer_ != nullptr) { 
+                    auto res = outer_->get(name); 
+                    return res;
+                } else {
+                    return make_pair(false, nullptr);
+                }
             }
         } 
+
+        Env() = default;
+        Env(const shared_ptr<Env>& outer):outer_(outer) { } 
+        Env(const Env&) = default;
     private:
         unordered_map<string, shared_ptr<Object>> env_;
+        shared_ptr<Env> outer_;
 
 };
 

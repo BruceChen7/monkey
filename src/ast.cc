@@ -116,7 +116,7 @@ shared_ptr<Object> BlockStatement::eval(Env* env) {
         res = s->eval(env);
 
         ReturnValue* rv = dynamic_cast<ReturnValue*>(res.get());
-        
+        // It's a return value; 
         if(rv != nullptr) {
             return res;
         } 
@@ -146,12 +146,55 @@ shared_ptr<Object> IfExpression::eval(Env* env) {
 }
 
 shared_ptr<Object> FunctionLiteral::eval(Env* env) { 
-    return shared_ptr<FunctionObj>(new FunctionObj(para_, body_, env));
+    auto e = shared_ptr<Env>(new Env(*env));
+    return shared_ptr<FunctionObj>(new FunctionObj(para_, body_, e));
+}
+
+
+static shared_ptr<Object> unwrapReturnValue(const shared_ptr<Object>& eval) { 
+    auto rv = dynamic_cast<ReturnValue*>(eval.get()); 
+    if(rv) {
+        return rv->val;
+    }
+    return eval;
+}
+static shared_ptr<Env> extendFunctionEnv(const FunctionObj* fn, vector<shared_ptr<Object>>& argument) { 
+    auto new_env = make_shared<Env>(fn->env);
+
+    for(int i = 0; i < fn->params.size(); i++) {
+        new_env->set(fn->params[i]->getValue(), argument[i]);
+    }
+    return new_env;
+}
+
+static shared_ptr<Object> applyFunction(Object* o, vector<shared_ptr<Object>>& argument) { 
+    auto fn = dynamic_cast<FunctionObj*>(o);
+    if(!fn) {
+        return shared_ptr<Object>(new Error({"not a function : ", fn->type()}));
+    }
+    auto extend_env = extendFunctionEnv(fn, argument);
+    auto evaluated =  fn->body->eval(extend_env.get());
+    return unwrapReturnValue(evaluated);
 }
 
 shared_ptr<Object> CallExpression::eval(Env* env) { 
     auto func = function_->eval(env);
     if(isError(func.get())) {
         return func; 
-    } 
+    }
+    vector<shared_ptr<Object>> arguments; 
+    for(const auto& a : arguments_) {
+        auto evaluated = a->eval(env);
+
+        if(isError(evaluated.get())) {
+            return evaluated;
+        }
+        arguments.push_back(evaluated);
+    }
+
+    if(arguments.size() == 1 && isError(arguments.back().get())) {
+        return arguments.back();
+    }
+    return applyFunction(func.get(), arguments);
 } 
+

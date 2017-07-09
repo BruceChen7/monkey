@@ -123,15 +123,13 @@ struct Error: public Object {
 struct FunctionObj: public Object {
     vector<shared_ptr<IdentifierNode>> params;
     shared_ptr<BlockStatement> body; 
-    Env* env;
-    FunctionObj(const vector<shared_ptr<IdentifierNode>>& p, const shared_ptr<BlockStatement>& b, Env* e):
+    shared_ptr<Env> env;
+    FunctionObj(const vector<shared_ptr<IdentifierNode>>& p, const shared_ptr<BlockStatement>& b, const shared_ptr<Env>& e):
         params(p), body(b), env(e) {  }
     string type() override {
         return "FUNCTION";
     }
+    // Implemented in obj.cc
     string inspect();
-    bool isTrue()override {
-        return false; 
-    }
 };
 #endif
