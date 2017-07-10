@@ -1,5 +1,4 @@
 ## Monkey is a small script langaugae
-====
 
 Monkey is a toy language which  can be used to learn some compiler theory for me. It's implemented by Pratt Parsers and a Tree-walking evaluation.
 
@@ -33,12 +32,12 @@ if( 2 > 1) { 1 } else { 2 }  // 1
 * Support **common arithmetic expression(+ - * /) and relationship expression ( > < != == )**
 
 ## tasks to be done
-- [] Support annotations features
-- [] Support strings
-- [] Suport arrays
-- [] Support built-in functions
-- [] Support hashes
-- [] Support macros
+- [ ] Support annotations features
+- [ ] Support strings
+- [ ] Suport arrays
+- [ ] Support built-in functions
+- [ ] Support hashes
+- [ ] Support macros
 
 ## Material to be read
 * [Pratt Parsers: Expression Parsing Made Easy](http://journal.stuffwithstuff.com/2011/03/19/pratt-parsers-expression-parsing-made-easy/)
