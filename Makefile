@@ -6,7 +6,7 @@ SRC := $(wildcard src/*.cc)
 SRC := $(filter-out $(MAIN_SRC), $(SRC))
 
 
-.PHONY:all test clean
+.PHONY:all test clean install
 
 all: 
 	@echo $(SRC)
@@ -21,5 +21,8 @@ test:
 
 clean:
 	@rm -rf bin/
+install:
+	@cp bin/*  /usr/local/bin
+
 	
 
