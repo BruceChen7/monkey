@@ -28,8 +28,13 @@ int main() {
             printErros(p->getErrors());
         } else { 
             auto val = program->eval(env.get());
-            if(val->type() == "INTEGER" || val->type() == "BOOLEAN") { 
+            
+            if( val->type() == "INTEGER" || val->type() == "BOOLEAN") { 
                 cout << val->inspect() << "\n";
+            }
+            // Support Ctrl-D
+            if( val->type() == "NULL") {
+                break;
             }
         }
     } 

@@ -25,7 +25,7 @@ string LetStatement::getValue() {
 }
 
 shared_ptr<Object> Program::eval(Env* env) {
-    shared_ptr<Object> res;
+    shared_ptr<Object> res = make_shared<NullObj>();
     for(const auto& s : statements_) {
         res = s->eval(env); 
         ReturnValue* rv = dynamic_cast<ReturnValue*>(res.get()); 
