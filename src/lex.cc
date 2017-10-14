@@ -11,6 +11,7 @@ const unordered_map<string, TokenType> Lex::sReserveWord = {
     {"false", TokenType::FALSE},
     {"if", TokenType::IF},
     {"else", TokenType::ELSE},
+    {"while", TokenType::WHILE},
 };
 
 Token Lex::getNextToken() {
@@ -42,7 +43,13 @@ Token Lex::getNextToken() {
             s.set("*",TokenType::PRODUCT);
             break;
         case '/':
-            s.set("/",TokenType::DIVIDE);
+            if(peekChar() != '/') {
+                s.set("/",TokenType::DIVIDE);
+            } else {
+                readChar();
+                s.set("", TokenType::EndOfLine);
+                readUntilEndOfLine();
+            }
             break; 
         case '{':
             s.set("{",TokenType::LBRACE);
@@ -98,3 +105,10 @@ Token Lex::getNextToken() {
     readChar();
     return s;
 } 
+
+void Lex::readUntilEndOfLine() {
+    while(cur_char_ != '\n' && cur_char_ != '\0') {
+        readChar();
+    }
+    readChar();
+}

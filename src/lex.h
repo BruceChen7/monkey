@@ -2,8 +2,8 @@
 #define __LEX__
 #include <string>
 #include <unordered_map>
-
 using namespace std;
+
 enum class TokenType { 
     EndOfLine,
     INT, //123
@@ -33,6 +33,8 @@ enum class TokenType {
     IF, // if
     ELSE, // else
     RETURN,  // return
+    COMMENT, // comment
+    WHILE, // while
     INVALID,
 };
 
@@ -93,6 +95,10 @@ static string convertTokenType(TokenType type) {
             return "return";
         case TokenType::INVALID:
             return "invalid";
+        case TokenType::WHILE:
+            return "while";
+        case TokenType::COMMENT:
+            return "comment";
         default:
             return "unknown";
     }
@@ -202,6 +208,7 @@ class Lex {
 
     public:
         Token getNextToken(); 
+        void readUntilEndOfLine();
 
     public:
         Lex(const Lex& ) = delete;

@@ -11,6 +11,8 @@ vector<string> tests = {
     "let add = fn(x, y) { return x + y }; " ,
     "-a * b;",
     "-a * b",
+    "// ab is a variable ",
+    "a * b; // a multiply b"
 };
 
 
@@ -81,6 +83,18 @@ vector<vector<Token>> res =  {
         {"*", TokenType::PRODUCT }, 
         {"b", TokenType::IDENTIFIER }, 
         {"", TokenType::EndOfLine }, 
+    },
+
+    {
+        {"", TokenType::EndOfLine}
+    },
+
+    {
+        {"a", TokenType::IDENTIFIER},
+        {"*", TokenType::PRODUCT},
+        {"b", TokenType::IDENTIFIER},
+        {";", TokenType::SEMICOLON},
+        {"", TokenType::EndOfLine},
     }
 };
 
