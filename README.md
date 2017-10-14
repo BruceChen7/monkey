@@ -32,7 +32,7 @@ if( 2 > 1) { 1 } else { 2 }  // 1
 * Support **common arithmetic expression(+ - * /) and relationship expression ( > < != == )**
 
 ## tasks to be done
-- [ ] Support annotations features
+- [x] Support annotations features
 - [ ] Support strings
 - [ ] Suport arrays
 - [ ] Support built-in functions
